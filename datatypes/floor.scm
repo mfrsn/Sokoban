@@ -21,11 +21,11 @@
     ; #### Public ####
     
     ; Returnerar objektets position på brädet.
-    (define/public (position?)
+    (define/public (get-position)
       position)
     
     ; Returnerar objektets typ.
-    (define/public (type?)
+    (define/public (get-type)
       type)
     
     ; Sätter objektets position på brädet till 'position'.
