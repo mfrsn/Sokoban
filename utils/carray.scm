@@ -7,6 +7,7 @@
 ; Beskrivning: Definierar klassen array%.
 ;=================================================
 
+(require scheme/mpair)
 
 (define array%
   (class object%
@@ -35,6 +36,7 @@
                   (loop)))))
         
         (loop)))
+    
     
     ; Kontrollfunktion av giltig adress [x,y] i en tvådimensionell array.
     (define/private (valid-address? x y)

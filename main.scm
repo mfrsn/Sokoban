@@ -8,7 +8,10 @@
 ;=====================================================
 
 (load "utils/position.scm")
+(load "utils/carray.scm")
+
 (load "datatypes/board.scm")
+(load "datatypes/floor.scm")
 
 (define test-board (new board%
                         [size-x 4]
@@ -16,10 +19,12 @@
 
 (display "[Set->Get test]")(newline)
 
-(define val 42)
-(define pos (make-position 1 3))
+(define position (make-position 1 3))
 
-(send test-board set-square! pos val)
+(define test-floor (new floor%
+                        [type 'wall]))
+
+(send test-board set-square! position test-floor)
 
 (display "Klarade testet? ")
-(eq? (send test-board get-square pos) val)
+(eq? (send test-board get-object position) test-floor)

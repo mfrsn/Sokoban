@@ -55,6 +55,7 @@
     
     ; Sätter golv-objektet på position till object
     (define/public (set-square! position object)
-      (send board set-element! object (get-x-position position) (get-y-position position)))
+      (send board set-element! object (get-x-position position) (get-y-position position))
+      (send object set-position! position))
     
     (super-new)))

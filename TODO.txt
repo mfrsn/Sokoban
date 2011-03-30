@@ -1,0 +1,9 @@
+# ADT Board
+
+	* (list-of-goals)
+	Funktion som skapar en lista av alla golvobjekt av typ 'mål' i nivån.
+
+# ADT Player
+
+	* move!
+	Fixa stöd för hantering av 'valid-move?':s returer.
