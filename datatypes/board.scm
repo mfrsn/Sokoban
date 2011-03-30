@@ -7,8 +7,6 @@
 ; Beskrivning: Definierar den abstrakta datatypen Board
 ;=======================================================
 
-(load "utils/carray.scm")
-
 ; Klass
 (define board%
   (class object%
