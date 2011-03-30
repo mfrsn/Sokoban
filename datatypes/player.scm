@@ -17,7 +17,8 @@
     ; Lokala fält
     (field (on-object #f) ; Ska spelaren hålla reda på objektet den befinner sig på? Framtida användning?
            (type 'player)
-           (current-power-up 'empty))
+           (current-power-up 'empty); Är båda dessa nödvändiga eller ska en power-up enbart transformeras
+           (current-power-up-procedure #f)) ; till enbart en procedur som lagras hos spelaren?
     
     ; #### Private ####
     (define/private (set-position! position)
@@ -36,11 +37,6 @@
     (define/public (set-power-up! power-up)
       (set! current-power-up power-up))
     
-    (define/public (use-power-up)
-      (
-       ;... to be defined ...
-       ))
-    
     ; Funktioner
     
     ; Flyttar spelaren
@@ -48,5 +44,11 @@
       (
        ;... to be defined ...
        ))
+    
+    ; Använder spelarens power-up
+    (define/public (use-power-up)
+      (
+       ;... to be defined ...
+       ))    
     
     (super-new)))
