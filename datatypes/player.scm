@@ -26,15 +26,20 @@
     ; #### Public ####
     
     ; Getters
-    (define/public (position?)
+    (define/public (get-position)
       position)
     
-    (define/public (type?)
+    (define/public (get-type)
       type)
     
     ; Setters
     (define/public (set-power-up! power-up)
       (set! current-power-up power-up))
+    
+    (define/public (use-power-up)
+      (
+       ;... to be defined ...
+       ))
     
     ; Funktioner
     

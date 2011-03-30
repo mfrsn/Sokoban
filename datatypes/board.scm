@@ -29,7 +29,7 @@
     (define/public (valid-move? position direction)
       (let ((new-position (calc-new-position position direction))
             (floor-object (get-object new-position))
-            (floor-type (send floor-object type?)))
+            (floor-type (send floor-object get-type)))
         (cond ((eq? floor-type 'wall) #f)
               ((eq? floor-type 'void) #f)
               ((eq? (send floor-object get-object) 'empty) #t)
