@@ -9,6 +9,7 @@
 
 (load "utils/position.scm")
 (load "datatypes/board.scm")
+(load "utils/level-init.scm")
 
 (define test-board (new board%
                         [size-x 4]
@@ -22,4 +23,4 @@
 (send test-board set-square! pos val)
 
 (display "Klarade testet? ")
-(eq? (send test-board get-square pos) val)
+(eq? (send test-board get-object pos) val)
