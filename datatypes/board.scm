@@ -25,7 +25,7 @@
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup returneras
     ; respektive objekt.
-    ; TODO: fixa kontroll hos spelarens move!
+    ; TODO: fixa ALLT!
     (define/public (valid-move? position direction)
       (let ((new-position (calc-new-position position direction))
             (floor-object (get-object new-position))
