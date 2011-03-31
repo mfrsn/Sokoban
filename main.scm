@@ -12,6 +12,7 @@
 
 (load "datatypes/board.scm")
 (load "datatypes/floor.scm")
+(load "datatypes/player.scm")
 
 (define test-board (new board%
                         [size-x 4]
@@ -19,12 +20,20 @@
 
 (display "[Set->Get test]")(newline)
 
-(define position (make-position 1 3))
+(define position1 (make-position 1 3))
+(define position2 (make-position 1 2))
 
-(define test-floor (new floor%
-                        [type 'wall]))
+(define test-floor1 (new floor%
+                         [type 'floor]))
+(send test-board set-square! position1 test-floor1)
 
-(send test-board set-square! position test-floor)
+(define test-floor2 (new floor%
+                         [type 'wall]))
+(send test-board set-square! position2 test-floor2)
 
-(display "Klarade testet? ")
-(eq? (send test-board get-object position) test-floor)
+(define *player* (new player%
+                      [current-position position1]
+                      [current-board test-board]))
+
+;(display "Klarade testet? ")
+;(eq? (send test-board get-object position) test-floor)

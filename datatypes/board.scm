@@ -26,13 +26,11 @@
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup returneras
     ; respektive objekt.
     ; TODO: fixa ALLT!
-    (define/public (valid-move? position direction)
-      (let ((new-position (calc-new-position position direction))
-            (floor-object (get-object new-position))
-            (floor-type (send floor-object get-type)))
-        (cond ((eq? floor-type 'wall) #f)
-              ((eq? floor-type 'void) #f)
-              ((eq? (send floor-object get-object) 'empty) #t)
+    (define/public (check-square position)
+      (let* ([floor-object (get-object position)]
+             [floor-object-type (send floor-object get-type)])
+        (cond ((eq? floor-object-type 'wall) #f)
+              ((eq? floor-object-type 'void) #f)
               (else (send floor-object get-object)))))
     
     ; Kontrollerar om alla målrutor är fyllda
@@ -55,5 +53,22 @@
     (define/public (set-square! position object)
       (send board set-element! object (get-x-position position) (get-y-position position))
       (send object set-position! position))
+    
+    ; Utför själva förflyttningen av objekt på spelplanen
+    (define/private (do-move! object current-position new-position)
+      (send (get-object current-position) delete-object!)
+      (send (get-object new-position) add-object! object)
+      (send object set-position! new-position))
+    
+    ; Funktionen som kontrollerar förflyttning på spelplanen
+    (define/public (move! object direction)
+      (let* ((current-position (send object get-position))
+             (new-position (calc-new-position current-position direction))
+             (check-square-result (check-square new-position)))
+        (if (not check-square-result)
+            (void)
+            (if (not (object? check-square-result))
+                (do-move! object current-position new-position)
+                #f))))
     
     (super-new)))
