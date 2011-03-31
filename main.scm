@@ -9,9 +9,11 @@
 
 (load "utils/position.scm")
 (load "utils/carray.scm")
+(load "utils/level-init.scm")
 
 (load "datatypes/board.scm")
 (load "datatypes/floor.scm")
+(load "datatypes/block.scm")
 
 (define test-board (new board%
                         [size-x 4]
@@ -28,3 +30,11 @@
 
 (display "Klarade testet? ")
 (eq? (send test-board get-object position) test-floor)
+
+(define play%
+  (class object%
+    
+    (define/public (test)
+      (send test-board get-object (make-position 1 3)))
+    
+    (super-new)))
