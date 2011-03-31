@@ -20,21 +20,16 @@
     ; #### Private ####
     
     ; Setters
-    (define/private (set-position! position)
+    (define/public (set-position! position)
       (set! current-position position))
     
     ; #### Public ####
     
     ; Getters
     (define/public (get-position)
-      position)
+      current-position)
     
     (define/public (get-type)
       type)
-    
-    (define/public (move! direction)
-      (
-       ;... to be defined
-       ))
     
     (super-new)))
