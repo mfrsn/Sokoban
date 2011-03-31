@@ -25,7 +25,7 @@
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.
-    (define/public (check-square position)
+    (define/private (check-square position)
       (let* ([floor-object (get-object position)]
              [floor-object-type (send floor-object get-type)])
         (cond ((eq? floor-object-type 'wall) #f)
@@ -75,6 +75,7 @@
     ; Funktion som hanterar upptagning av power-up
     (define/private (handle-power-up player power-up player-position power-up-position)
       (send player set-power-up! power-up)
+      (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
       (do-move! player player-position power-up-position))
     
