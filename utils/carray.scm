@@ -55,13 +55,13 @@
     ; Funktion som returnerar värdet för en 2D-array 'array' på address [x,y].
     (define/public (get-element x y)
       (if (valid-address? x y)
-          (vector-ref (vector-ref array y) x)
+          (vector-ref (vector-ref array x) y)
           (error "Address is out of bounds." x y)))
     
     ; Funktion som för in 'element' på adress [x,y] i en array 'array'.
     (define/public (set-element! element x y)
       (if (valid-address? x y) 
-          (vector-set! (vector-ref array y) x element)
+          (vector-set! (vector-ref array x) y element)
           (error "Address is out of bounds." x y)))
     
     

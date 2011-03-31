@@ -22,7 +22,7 @@
     
     ; Returnerar objektets position på brädet.
     (define/public (get-position)
-      position)
+      current-position)
     
     ; Returnerar objektets typ.
     (define/public (get-type)
@@ -41,7 +41,7 @@
       (set! current-object object))
     
     ; Tar bort objektet som befinner sig på golvobjektet.
-    (define/public (delete-object! object)
+    (define/public (delete-object!)
       (set! current-object 'empty))
     
     (super-new)))

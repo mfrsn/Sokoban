@@ -12,7 +12,6 @@
     
     ; Konstruktorvärden
     (init-field current-position
-                on-object
                 power-up-procedure)
     
     ; Lokala fält
@@ -35,14 +34,5 @@
     
     (define/public (get-power-up-procedure)
       power-up-procedure)
-    
-    ; Funktioner
-    
-    ; Tar upp power-up:en. Flyttar alltså denna från spelplanen till spelaren. 
-    ; **** Remake utifrån vad vi bestämmer ang. lagring hos spelaren ****
-    (define/public (take-power-up)
-      (send on-object delete-object!)
-      (send *player* set-power-up! this)
-      (set-position! 'player))
-    
+     
     (super-new)))
