@@ -91,4 +91,18 @@
                     (handle-block-move object check-square-result current-position new-position direction)
                     (handle-power-up object check-square-result current-position new-position))))))
     
+    (define/public (print-board)
+      (define (iter-r row)
+        
+        (define (iter-c col)
+          (cond ((= col size-x) (void))
+                (else (display (send (get-object (make-position col row)) get-type)) (display " ")
+                      (iter-c (+ col 1)))))
+        
+        (cond ((= row size-y) (void))
+              (else (iter-c 0) (newline)
+                    (iter-r (+ row 1)))))
+      
+      (iter-r 0))
+    
     (super-new)))

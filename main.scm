@@ -9,6 +9,7 @@
 
 (load "utils/position.scm")
 (load "utils/carray.scm")
+(load "utils/level-init.scm")
 
 (load "datatypes/board.scm")
 (load "datatypes/floor.scm")

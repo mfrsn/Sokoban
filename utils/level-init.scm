@@ -13,17 +13,38 @@
 (define (load-level-file filename)
   (read-csv-file filename))
 
+(define (parse-level-data data *player*)
+  (letrec ([map-height (length data)]
+           [map-width (length (car data))]
+           [level (new board%
+                       [size-x map-width]
+                       [size-y map-height])])
+    
+    (define (iter-r row row-list)
+      
+      (define (iter-c col col-list)
+        (cond ((= col map-width) (void))
+              (else (send level set-square! (make-position col row) (create-floor 'wall 'empty))
+                    (iter-c (+ col 1) (cdr col-list)))))
+      
+      (cond ((= row map-height) (void))
+            (else (iter-c 0 (car row-list))
+                  (iter-r (+ row 1) (cdr row-list)))))
+    
+    (iter-r 0 data)
+    level))
+
 ; Parsar en data-struktur (lista med listor) och returnerar
 ; ett board-objekt.
 ; EJ KLAR!!!!!
-(define (parse-level-data data *player*)
+(define (parse-level-data-crap data *player*)
   (if (or (null? data) (not(list? data)))
       (error "Invalid level data. Given:" data)
       (let* ((map-height (length data))
              (map-width (length (car data)))
              (level (new board%
-                         [size-x (+ map-width 1)]
-                         [size-y (+ map-height 1)])))
+                         [size-x (+ map-width 0)]
+                         [size-y (+ map-height 0)])))
         
         ; Iterera genom raderna
         (define (iter-rows row row-list)
@@ -52,8 +73,9 @@
                   )
           
           (cond ((null? row-list) (void))
-                (else (iter-cols 0 (car row-list))
-                      (iter-rows (+ row 1) (cdr row-list)))))
+                (else (begin
+                        (iter-cols 0 (car row-list))
+                        (iter-rows (+ row 1) (cdr row-list))))))
         
         ; Kör!
         (iter-rows 0 data)
