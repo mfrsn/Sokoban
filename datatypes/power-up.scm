@@ -17,12 +17,6 @@
     ; Lokala fält
     (field (type 'power-up))
     
-    ; #### Private ####
-    
-    ; Setters
-    (define/private (set-position! position)
-      (set! current-position position))
-    
     ; #### Public ####
     
     ; Getters
@@ -31,6 +25,10 @@
     
     (define/public (get-type)
       type)
+    
+    ; Setters
+    (define/private (set-position! position)
+      (set! current-position position))
     
     (define/public (get-power-up-procedure)
       power-up-procedure)
