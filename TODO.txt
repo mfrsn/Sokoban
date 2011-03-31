@@ -6,4 +6,5 @@
 # ADT Player
 
 	* move!
+hej hej nu blir det fel
 	Fixa stöd för hantering av 'valid-move?':s returer.
