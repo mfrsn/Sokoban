@@ -96,7 +96,9 @@
         
         (define (iter-c col)
           (cond ((= col size-x) (void))
-                (else (display (send (get-object (make-position col row)) get-type)) (display " ")
+                (else (if (eq? (send (get-object (make-position col row)) get-object) 'empty)
+                          (begin (display (send (get-object (make-position col row)) get-type)) (display " "))
+                          (begin (display (send (send (get-object (make-position col row)) get-object) get-type)) (display " ")))
                       (iter-c (+ col 1)))))
         
         (cond ((= row size-y) (void))

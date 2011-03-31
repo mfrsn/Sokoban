@@ -23,9 +23,20 @@
     (define (iter-r row row-list)
       
       (define (iter-c col col-list)
-        (cond ((= col map-width) (void))
-              (else (send level set-square! (make-position col row) (create-floor 'wall 'empty))
-                    (iter-c (+ col 1) (cdr col-list)))))
+        (if (= col map-width)
+            (void)
+            (begin (cond ((string=? (car col-list) "w")
+                          (add-wall level (make-position col row)))
+                         ((string=? (car col-list) "f")
+                          (add-floor level (make-position col row)))
+                         ((string=? (car col-list) "g")
+                          (add-goal level (make-position col row)))
+                         ((string=? (car col-list) "b")
+                          (add-block level (make-position col row)))
+                         ((string=? (car col-list) "x")
+                          (add-player level (make-position col row) *player*))
+                        (else (error "Unknown building block, given" (car col-list))))
+                   (iter-c (+ col 1) (cdr col-list)))))
       
       (cond ((= row map-height) (void))
             (else (iter-c 0 (car row-list))
@@ -34,62 +45,30 @@
     (iter-r 0 data)
     level))
 
-; Parsar en data-struktur (lista med listor) och returnerar
-; ett board-objekt.
-; EJ KLAR!!!!!
-(define (parse-level-data-crap data *player*)
-  (if (or (null? data) (not(list? data)))
-      (error "Invalid level data. Given:" data)
-      (let* ((map-height (length data))
-             (map-width (length (car data)))
-             (level (new board%
-                         [size-x (+ map-width 0)]
-                         [size-y (+ map-height 0)])))
-        
-        ; Iterera genom raderna
-        (define (iter-rows row row-list)
-          
-          ; Iterera genom kolonnerna
-          (define (iter-cols col col-list)
-            (cond ((null? col-list) (newline))
-                  ((string=? (car col-list) "w")
-                   (add-floor level (make-position col row) (create-floor 'wall 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "f")
-                   (add-floor level (make-position col row) (create-floor 'floor 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "g")
-                   (add-floor level (make-position col row) (create-floor 'goal 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "v")
-                   (add-floor level (make-position col row) (create-floor 'void 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "b")
-                   (add-floor level (make-position col row) (create-block (make-position col row)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "x")
-                   (add-floor level (make-position col row) (create-floor 'floor *player*)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  )
-          
-          (cond ((null? row-list) (void))
-                (else (begin
-                        (iter-cols 0 (car row-list))
-                        (iter-rows (+ row 1) (cdr row-list))))))
-        
-        ; Kör!
-        (iter-rows 0 data)
-        level)))
-
 (define (create-floor type object)
   (new floor%
        [type type]
        [current-object object]))
 
-(define (add-floor board position floor-object)
-  (send board set-square! position floor-object))
-
 (define (create-block position)
-  (let ((block (new block%
-                    [current-position position])))
-    (create-floor 'floor block)))
+  (create-floor 'floor (new block%
+                            [current-position position])))
+
+(define (add-floor board position)
+  (send board set-square! position (create-floor 'floor 'empty)))
+
+(define (add-wall board position)
+  (send board set-square! position (create-floor 'wall 'empty)))
+  
+(define (add-goal board position)
+  (send board set-square! position (create-floor 'goal 'empty))
+  ; add to goal-list of board
+  )
+
+(define (add-block board position)
+  (send board set-square! position (create-block position)))
+
+(define (add-player board position *player*)
+  (send board set-square! position (create-floor 'floor *player*))
+  (send *player* set-position! position)
+  (send *player* set-board! board))

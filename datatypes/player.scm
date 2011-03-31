@@ -39,6 +39,9 @@
     (define/public (set-position! position)
       (set! current-position position))
     
+    (define/public (set-board! board)
+      (set! current-board board))
+    
     ; Funktioner
        
     ; Flyttar spelaren
