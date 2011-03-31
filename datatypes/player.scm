@@ -17,8 +17,7 @@
     
     ; Lokala fält
     (field (type 'player)
-           (current-power-up 'empty); Är båda dessa nödvändiga eller ska en power-up enbart transformeras
-           (current-power-up-procedure #f)) ; till en procedur som lagras hos spelaren?
+           (current-power-up 'empty)) ; till en procedur som lagras hos spelaren?
     
     ; #### Private ####
     
@@ -47,8 +46,9 @@
     
     ; Använder spelarens power-up
     (define/public (use-power-up)
-      (
-       ;... to be defined ...
-       ))    
+      (if (eq? current-power-up 'empty?)
+          (error "Called use-power-up with no power-up")
+          ((send current-power-up get-power-up-procedure))))
+                     
     
     (super-new)))
