@@ -20,12 +20,12 @@
     
     ; Arrayskaparfunktion
     (define/private (make-array width height)
-      (let ((root (make-vector height))
+      (let ((root (make-vector width))
             (address-counter 0))
         
         ; Loop som skapar varje element
         (define (loop)
-          (let ((vector-element (make-vector width)))
+          (let ((vector-element (make-vector height)))
             (if (= address-counter height)
                 root
                 (begin
@@ -40,8 +40,8 @@
     
     ; Kontrollfunktion av giltig adress [x,y] i en tvådimensionell array.
     (define/private (valid-address? x y)
-      (not (or (>= x (vector-length array))
-               (>= y (vector-length (vector-ref array 0))))))
+      (not (or (>= y (vector-length array))
+               (>= x (vector-length (vector-ref array 0))))))
     
     ; Den lokala arrayen
     (define array (make-array width height))
@@ -55,13 +55,13 @@
     ; Funktion som returnerar värdet för en 2D-array 'array' på address [x,y].
     (define/public (get-element x y)
       (if (valid-address? x y)
-          (vector-ref (vector-ref array y) x)
+          (vector-ref (vector-ref array x) y)
           (error "Address is out of bounds." x y)))
     
     ; Funktion som för in 'element' på adress [x,y] i en array 'array'.
     (define/public (set-element! element x y)
       (if (valid-address? x y) 
-          (vector-set! (vector-ref array y) x element)
+          (vector-set! (vector-ref array x) y element)
           (error "Address is out of bounds." x y)))
     
     
