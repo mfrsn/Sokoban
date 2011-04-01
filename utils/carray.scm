@@ -40,8 +40,8 @@
     
     ; Kontrollfunktion av giltig adress [x,y] i en tvådimensionell array.
     (define/private (valid-address? x y)
-      (not (or (>= y (vector-length array))
-               (>= x (vector-length (vector-ref array 0))))))
+      (not (or (>= x (vector-length array))
+               (>= y (vector-length (vector-ref array 0))))))
     
     ; Den lokala arrayen
     (define array (make-array width height))

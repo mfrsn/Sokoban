@@ -17,46 +17,36 @@
 ; ett board-objekt.
 ; EJ KLAR!!!!!
 (define (parse-level-data data *player*)
-  (if (or (null? data) (not(list? data)))
+  (if (or (null? data) (not (list? data)))
       (error "Invalid level data. Given:" data)
       (let* ((map-height (length data))
              (map-width (length (car data)))
              (level (new board%
-                         [size-x (+ map-width 1)]
-                         [size-y (+ map-height 1)])))
+                         [size-x (+ map-width 0)]
+                         [size-y (+ map-height 0)])))
         
-        ; Iterera genom raderna
-        (define (iter-rows row row-list)
-          
-          ; Iterera genom kolonnerna
-          (define (iter-cols col col-list)
-            (cond ((null? col-list) (newline))
-                  ((string=? (car col-list) "w")
-                   (add-floor level (make-position col row) (create-floor 'wall 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "f")
-                   (add-floor level (make-position col row) (create-floor 'floor 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "g")
-                   (add-floor level (make-position col row) (create-floor 'goal 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "v")
-                   (add-floor level (make-position col row) (create-floor 'void 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "b")
-                   (add-floor level (make-position col row) (create-block (make-position col row)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "x")
-                   (add-floor level (make-position col row) (create-floor 'floor *player*)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  )
-          
-          (cond ((null? row-list) (void))
-                (else (iter-cols 0 (car row-list))
-                      (iter-rows (+ row 1) (cdr row-list)))))
+        (display map-width)(newline)
+        (display map-height)(newline)
         
-        ; Kör!
-        (iter-rows 0 data)
+        (map
+         (lambda (row)
+           (let ((row-count 0))
+             (map
+              (lambda (element)
+                (let ((col-count 0))
+                  (cond ((string=? element "w")
+                         (add-floor level (make-position col-count row-count) (create-floor 'wall 'empty)) (set! col-count (+ col-count 1)))
+                        ((string=? element "f")
+                         (add-floor level (make-position col-count row-count) (create-floor 'floor 'empty)) (set! col-count (+ col-count 1)))
+                        ((string=? element "g")
+                         (add-floor level (make-position col-count row-count) (create-floor 'goal 'empty)) (set! col-count (+ col-count 1)))
+                        ((string=? element "v")
+                         (add-floor level (make-position col-count row-count) (create-floor 'void 'empty)) (set! col-count (+ col-count 1)))
+                        ((string=? element "b")
+                         (add-floor level (make-position col-count row-count) (create-block (make-position col-count row-count))) (set! col-count (+ col-count 1)))
+                        ((string=? element "x")
+                         (add-floor level (make-position col-count row-count) (create-floor 'floor *player*)))))) row) (set! row-count (+ row-count 1)))) data)
+        
         level)))
 
 (define (create-floor type object)

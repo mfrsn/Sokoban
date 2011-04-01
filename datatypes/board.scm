@@ -44,6 +44,10 @@
               (else (goal-iter (cdr list-of-goals)))))
       (goal-iter list-of-goals))
     
+    ; TEMP Returnerar board
+    (define/public (get-board)
+      (send board get-array))
+    
     ; Returnerar golv-objektet på position
     (define/public (get-object position)
       (send board get-element (get-x-position position) (get-y-position position)))
