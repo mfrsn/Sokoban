@@ -43,7 +43,8 @@
     ; Funktion som hanterar förflyttning av block och spelare
     (define/private (handle-block-move player block player-position block-position direction)
       (let ((new-position (calc-new-position block-position direction)))
-        (if (is-empty? new-position)
+        (if (and (is-empty? new-position)
+                 (check-square new-position)
             (begin
               (do-move! block block-position new-position)
               (do-move! player player-position block-position))
@@ -68,7 +69,7 @@
     ; #### Public ####
     
     ; Lägger till spelaren i brädet UTROPSTECKEN!
-    (define/public (add-player player)
+    (define/public (add-player! player)
       (send (get-object start-position) add-object! player)
       (send player set-position! start-position))
     

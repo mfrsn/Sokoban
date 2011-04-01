@@ -45,7 +45,7 @@
                          ((string=? (car col-list) "b")
                           (add-block level (make-position col row)))
                          ((string=? (car col-list) "x")
-                          (add-player level (make-position col row)))
+                          (add-player! level (make-position col row)))
                          ((string=? (car col-list) "pt")
                           (add-powerup level (make-position col row) 'teleport))
                         (else (error "Unknown building block, given" (car col-list))))
