@@ -7,67 +7,94 @@
 ; Beskrivning: Laddar in nivå-filerna i board-objekt
 ;=====================================================
 
+; för read-csv-file
 (require 2htdp/batch-io)
 
-; Lager runt read-csv-file för namntydlighet
+; Lager runt read-csv-file för namntydlighet.
+; Lagrar inläst data i en lista av listor
 (define (load-level-file filename)
   (read-csv-file filename))
 
-; Parsar en data-struktur (lista med listor) och returnerar
-; ett board-objekt.
-; EJ KLAR!!!!!
+; Parsar en lista av listor och skapar en
+; bana utifrån det. Returnerar sedan nivå-
+; objektet.
 (define (parse-level-data data *player*)
-  (if (or (null? data) (not(list? data)))
-      (error "Invalid level data. Given:" data)
-      (let* ((map-height (length data))
-             (map-width (length (car data)))
-             (level (new board%
-                         [size-x (+ map-width 0)]
-                         [size-y (+ map-height 0)])))
-        
-        ; Iterera genom raderna
-        (define (iter-rows row row-list)
-          
-          ; Iterera genom kolonnerna
-          (define (iter-cols col col-list)
-            (cond ((null? col-list) (newline))
-                  ((string=? (car col-list) "w")
-                   (add-floor level (make-position col row) (create-floor 'wall 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "f")
-                   (add-floor level (make-position col row) (create-floor 'floor 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "g")
-                   (add-floor level (make-position col row) (create-floor 'goal 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "v")
-                   (add-floor level (make-position col row) (create-floor 'void 'empty))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "b")
-                   (add-floor level (make-position col row) (create-block (make-position col row)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  ((string=? (car col-list) "x")
-                   (add-floor level (make-position col row) (create-floor 'floor *player*)))
-                   (iter-cols (+ col 1) (cdr col-list)))
-                  )
-          
-          (cond ((null? row-list) (void))
-                (else (iter-cols 0 (car row-list))
-                      (iter-rows (+ row 1) (cdr row-list)))))
-        
-        ; Kör!
-        (iter-rows 0 data)
-        level)))
+  (letrec ([map-height (length data)]
+           [map-width (length (car data))]
+           [level (new board%
+                       [size-x map-width]
+                       [size-y map-height])])
+    
+    ; iterera genom raderna (y-koordinater)
+    (define (iter-r row row-list)
 
+      ; itererar genom kolonnerna (x-koordinater)
+      (define (iter-c col col-list)
+        (if (= col map-width)
+            (void)
+            (begin (cond ((string=? (car col-list) "w")
+                          (add-floor level (make-position col row) 'wall))
+                         ((string=? (car col-list) "v")
+                          (add-floor level (make-position col row) 'void))
+                         ((string=? (car col-list) "f")
+                          (add-floor level (make-position col row) 'floor))
+                         ((string=? (car col-list) "g")
+                          (add-goal level (make-position col row)))
+                         ((string=? (car col-list) "b")
+                          (add-block level (make-position col row)))
+                         ((string=? (car col-list) "x")
+                          (add-player level (make-position col row) *player*))
+                         ((string=? (car col-list) "pt")
+                          (add-powerup level (make-position col row) 'teleport))
+                        (else (error "Unknown building block, given" (car col-list))))
+                   (iter-c (+ col 1) (cdr col-list)))))
+      
+      (cond ((= row map-height) (void))
+            (else (iter-c 0 (car row-list))
+                  (iter-r (+ row 1) (cdr row-list)))))
+    
+    (iter-r 0 data)
+    level))
+
+; Skapar ett golvobjekt
 (define (create-floor type object)
   (new floor%
        [type type]
        [current-object object]))
 
-(define (add-floor board position floor-object)
-  (send board set-square! position floor-object))
-
+; Skapar ett nytt block och lägger detta på ett
+; nytt golvobjekt. Returnerar sedan golvobjektet.
 (define (create-block position)
-  (let ((block (new block%
-                    [current-position position])))
-    (create-floor 'floor block)))
+  (create-floor 'floor (new block%
+                            [current-position position])))
+
+; Lägger till ett golvobjekt på brädet
+(define (add-floor board position type)
+  (send board set-square! position (create-floor type 'empty)))
+  
+; Lägger till ett målområde på brädet
+(define (add-goal board position)
+  (let ((goal (create-floor 'goal 'empty)))
+    (send board set-square! position goal)
+    (send board add-to-goal-list! goal)))
+
+; Lägger till ett block+golv på brädet
+(define (add-block board position)
+  (send board set-square! position (create-block position)))
+
+; Lägger till spelaren
+(define (add-player board position *player*)
+  (send board set-square! position (create-floor 'floor *player*))
+  (send *player* set-position! position)
+  (send *player* set-board! board))
+  
+; Lägger till en power-up
+(define (add-powerup board position attribute)
+  (cond ((eq? attribute 'teleport)
+         (send board set-square! position
+               (create-floor 'floor
+                             (new power-up%
+                                  [current-position position]
+                                  [power-up-procedure (lambda ()
+                                                        (display "Teleportin mah block"))]))))
+         (else (error "Invalid power-up attribute. Given:" attribute))))

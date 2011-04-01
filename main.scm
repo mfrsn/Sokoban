@@ -8,19 +8,18 @@
 ;=====================================================
 
 (load "utils/position.scm")
-(load "datatypes/board.scm")
+(load "utils/carray.scm")
 (load "utils/level-init.scm")
 
-(define test-board (new board%
-                        [size-x 4]
-                        [size-y 4]))
+(load "datatypes/board.scm")
+(load "datatypes/floor.scm")
+(load "datatypes/player.scm")
+(load "datatypes/power-up.scm")
+(load "datatypes/block.scm")
 
-(display "[Set->Get test]")(newline)
+(define *player* (new player%
+                      [current-position 'unknown]
+                      [current-board 'none]))
 
-(define val 42)
-(define pos (make-position 1 3))
-
-(send test-board set-square! pos val)
-
-(display "Klarade testet? ")
-(eq? (send test-board get-object pos) val)
+(define level-data (load-level-file "levels/level-2"))
+(define level (parse-level-data level-data *player*))
