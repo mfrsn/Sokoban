@@ -1,11 +1,13 @@
-;=====================================================
-; PRAM 2011, Senast ändrad 2011-03-XX
+;================================================================
+; PRAM 2011
+; Senaste ändring: ändrade sättet spelaren läggs till 2011-04-01
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
 ; Fil: level-init.scm
 ; Beskrivning: Laddar in nivå-filerna i board-objekt
-;=====================================================
+;================================================================
 
 ; för read-csv-file
 (require 2htdp/batch-io)
@@ -18,7 +20,7 @@
 ; Parsar en lista av listor och skapar en
 ; bana utifrån det. Returnerar sedan nivå-
 ; objektet.
-(define (parse-level-data data *player*)
+(define (parse-level-data data)
   (letrec ([map-height (length data)]
            [map-width (length (car data))]
            [level (new board%
@@ -43,7 +45,7 @@
                          ((string=? (car col-list) "b")
                           (add-block level (make-position col row)))
                          ((string=? (car col-list) "x")
-                          (add-player level (make-position col row) *player*))
+                          (add-player level (make-position col row)))
                          ((string=? (car col-list) "pt")
                           (add-powerup level (make-position col row) 'teleport))
                         (else (error "Unknown building block, given" (car col-list))))
@@ -83,10 +85,14 @@
   (send board set-square! position (create-block position)))
 
 ; Lägger till spelaren
-(define (add-player board position *player*)
-  (send board set-square! position (create-floor 'floor *player*))
-  (send *player* set-position! position)
-  (send *player* set-board! board))
+;(define (add-player board position *player*)
+  ;(send board set-square! position (create-floor 'floor *player*))
+  ;(send *player* set-position! position)
+  ;(send *player* set-board! board))
+
+(define (add-player board position)
+  (send board set-square! position (create-floor 'floor 'empty))
+  (send board set-start-position! position))
   
 ; Lägger till en power-up
 (define (add-powerup board position attribute)

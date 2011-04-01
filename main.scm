@@ -1,5 +1,5 @@
 ;=====================================================
-; PRAM 2011, Senast ändrad 2011-03-XX
+; PRAM 2011, Senast ändrad 2011-04-01
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
@@ -46,5 +46,5 @@
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define level-data (load-level-file "levels/level-2"))
-(define level (parse-level-data level-data *player*))
+(define *level-2* (parse-level-data (load-level-file "levels/level-2")))
+(send *player* set-board! *level-2*)
