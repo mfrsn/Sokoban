@@ -36,7 +36,7 @@
 ; Paneler
 (define top-panel (new horizontal-panel%
                        [parent frame]
-                       [vert-margin 60]
+                       [min-height 60]
                        [alignment '(center top)]))
 
 ; Knappar
