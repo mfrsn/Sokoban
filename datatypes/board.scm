@@ -1,5 +1,7 @@
 ;=======================================================
-; PRAM 2011, Senast ändrad 2011-03-XX
+; PRAM 2011
+; Senaste ändring: add-player tillagd 2011-04-01
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
@@ -23,7 +25,8 @@
                        [height size-y]))
            
            ; Lista med målområdesobjekten för effektiv åtkomst vid vinstkontroll
-           (list-of-goals '()))
+           (list-of-goals '())
+           (start-position #f))
     
     ; #### Private ####
     
@@ -64,6 +67,11 @@
     
     ; #### Public ####
     
+    ; Lägger till spelaren i brädet
+    (define/public (add-player player)
+      (send (get-object start-position) add-object! player)
+      (send player set-position! start-position))
+    
     ; Kontrollerar om alla målrutor är fyllda
     (define/public (level-complete?)
       (define (goal-iter list-of-goals)
@@ -76,11 +84,11 @@
     
     ; Lägger in ett målobjekt i listan av mål
     (define/public (add-to-goal-list! goal)
-      (display "adding goal: ") (display goal)
       (set! list-of-goals (mcons goal list-of-goals)))
     
-    (define/public (get-goals)
-      list-of-goals)
+    ; Uppdaterar startposition för spelaren
+    (define/public (set-start-position! position)
+      (set! start-position position))
     
     ; TEMP Returnerar board
     (define/public (get-board)

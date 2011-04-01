@@ -1,5 +1,7 @@
 ;=====================================================
-; PRAM 2011, Senast ändrad 2011-03-30
+; PRAM 2011
+; Senaste ändring: set-board! modifierad 2011-04-01
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
@@ -39,10 +41,11 @@
       (set! current-position position))
     
     (define/public (set-board! board)
-      (set! current-board board))
+      (set! current-board board)
+      (send board add-player this))
     
     ; Funktioner
-       
+    
     ; Flyttar spelaren
     (define/public (move! direction)
       (send current-board move! this direction))
