@@ -23,35 +23,7 @@
            ; Lista med målområdesobjekten för effektiv åtkomst vid vinstkontroll
            (list-of-goals #f))
     
-    ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
-    ; respektive objekt.
-    (define/private (check-square position)
-      (let* ([floor-object (get-object position)]
-             [floor-object-type (send floor-object get-type)])
-        (cond ((eq? floor-object-type 'wall) #f)
-              ((eq? floor-object-type 'void) #f)
-              (else (send floor-object get-object)))))
-    
-    ; Kontrollerar om alla målrutor är fyllda
-    (define/public (level-complete?)
-      (define (goal-iter list-of-goals)
-        (cond ((not (list-of-goals))
-               (error ("No goal objects instantiated.")))
-              ((null? list-of-goals)
-               #t)
-              ((eq? (send (car list-of-goals) get-object) 'empty)
-               #f)
-              (else (goal-iter (cdr list-of-goals)))))
-      (goal-iter list-of-goals))
-    
-    ; Returnerar golv-objektet på position
-    (define/public (get-object position)
-      (send board get-element (get-x-position position) (get-y-position position)))
-    
-    ; Sätter golv-objektet på position till object
-    (define/public (set-square! position object)
-      (send board set-element! object (get-x-position position) (get-y-position position))
-      (send object set-position! position))
+    ; #### Private ####
     
     ; Utför själva förflyttningen av objekt på spelplanen
     (define/private (do-move! object current-position new-position)
@@ -78,6 +50,38 @@
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
       (do-move! player player-position power-up-position))
+    
+    ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
+    ; respektive objekt.
+    (define/private (check-square position)
+      (let* ([floor-object (get-object position)]
+             [floor-object-type (send floor-object get-type)])
+        (cond ((eq? floor-object-type 'wall) #f)
+              ((eq? floor-object-type 'void) #f)
+              (else (send floor-object get-object)))))
+    
+    ; #### Public ####
+    
+    ; Kontrollerar om alla målrutor är fyllda
+    (define/public (level-complete?)
+      (define (goal-iter list-of-goals)
+        (cond ((not (list-of-goals))
+               (error ("No goal objects instantiated.")))
+              ((null? list-of-goals)
+               #t)
+              ((eq? (send (car list-of-goals) get-object) 'empty)
+               #f)
+              (else (goal-iter (cdr list-of-goals)))))
+      (goal-iter list-of-goals))
+    
+    ; Returnerar golv-objektet på position
+    (define/public (get-object position)
+      (send board get-element (get-x-position position) (get-y-position position)))
+    
+    ; Sätter golv-objektet på position till object
+    (define/public (set-square! position object)
+      (send board set-element! object (get-x-position position) (get-y-position position))
+      (send object set-position! position))
     
     ; Funktionen som kontrollerar förflyttning på spelplanen
     (define/public (move! object direction)
