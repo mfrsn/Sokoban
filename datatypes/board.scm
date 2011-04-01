@@ -67,18 +67,20 @@
     ; Kontrollerar om alla målrutor är fyllda
     (define/public (level-complete?)
       (define (goal-iter list-of-goals)
-        (cond ((not (list-of-goals))
-               (error ("No goal objects instantiated.")))
-              ((null? list-of-goals)
+        (cond ((null? list-of-goals)
                #t)
-              ((eq? (send (car list-of-goals) get-object) 'empty)
+              ((eq? (send (mcar list-of-goals) get-object) 'empty)
                #f)
-              (else (goal-iter (cdr list-of-goals)))))
+              (else (goal-iter (mcdr list-of-goals)))))
       (goal-iter list-of-goals))
     
     ; Lägger in ett målobjekt i listan av mål
     (define/public (add-to-goal-list! goal)
-      (mcons goal list-of-goals))
+      (display "adding goal: ") (display goal)
+      (set! list-of-goals (mcons goal list-of-goals)))
+    
+    (define/public (get-goals)
+      list-of-goals)
     
     ; TEMP Returnerar board
     (define/public (get-board)
