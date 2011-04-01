@@ -10,31 +10,9 @@
 (load "utils/position.scm")
 (load "utils/carray.scm")
 (load "utils/level-init.scm")
-
-(define (test-run-level-1)
-  (send *player* move! 'up)
-  (send *player* move! 'left)
-  (send *player* move! 'left)
-  (send *player* move! 'left)
-  (send *player* move! 'up)
-  (send *player* move! 'up)
-  (send *player* move! 'up)
-  (send *player* move! 'left)
-  (send *player* move! 'up)
-  (send *player* move! 'left)
-  (send *player* move! 'up)
-  (send *player* move! 'up)
-  (send *player* move! 'down)
-  (display "Use power-up: ")
-  (send *player* use-power-up) (newline)
-  (display "Power-up gone? ")
-  (eq? (send *player* use-power-up) 'empty)
-  (display "Moved blocks? ") (newline)
-  (display "Block 1: ")
-  (not (eq? (send (send level get-object (make-position 7 2)) get-object) 'empty)) (newline)
-  (display "Block 2: ")
-  (not (eq? (send (send level get-object (make-position 6 4)) get-object) 'empty)) (newline)
-  (display "DONE!"))
+(load "utils/GUI.scm")
+(load "utils/ccanvas.scm")
+(load "utils/draw.scm")
 
 (load "datatypes/board.scm")
 (load "datatypes/floor.scm")
@@ -46,5 +24,29 @@
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define *level-2* (parse-level-data (load-level-file "levels/level-2")))
+(define *level-2* (parse-level-data (load-level-file "levels/level-1")))
 (send *player* set-board! *level-2*)
+
+; Starta GUI
+
+; Konstanter
+(define width 800)
+(define height 480)
+
+; Skapar GUI:n och returnerar canvasobjektet.
+
+; Skapar ett draw-objekt som definieras som objektet *game-canvas*
+; (make-gui) returnerar det canvasobjektet som ligger i vår frame.
+; draw-object% lägger den grafiska funktionaliteten till canvas.
+
+(define *game-canvas* (new draw-object%
+                           [canvas (make-gui width height)]
+                           [current-board *level-2*]))
+
+; NOTE: När vi byter bana måste följande hända:
+; (send *game-canvas* set-board! --ny-nivå--)
+; (send *game-canvas* redraw)
+
+; Vi måste vänta innan vi kan skicka draw...
+(sleep/yield 0.01)
+(send *game-canvas* draw)

@@ -67,7 +67,7 @@
     
     ; #### Public ####
     
-    ; Lägger till spelaren i brädet
+    ; Lägger till spelaren i brädet UTROPSTECKEN!
     (define/public (add-player player)
       (send (get-object start-position) add-object! player)
       (send player set-position! start-position))
@@ -93,6 +93,14 @@
     ; TEMP Returnerar board
     (define/public (get-board)
       (send board get-array))
+    
+    ; Returnerar brädets bredd
+    (define/public (get-width)
+      size-x)
+    
+    ; Returnerar brädets höjd
+    (define/public (get-height)
+      size-y)
     
     ; Returnerar golv-objektet på position
     (define/public (get-object position)
