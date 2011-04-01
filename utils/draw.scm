@@ -26,7 +26,13 @@
      (dc (send canvas get-dc))
      
      ; Konstanta verktyg
-     (background-colour (make-colour 135 184 145))
+     (background-colour (make-colour 0 34 102))
+     (player-colour (make-colour 178 34 34))
+     (block-colour (make-colour 94 64 51))
+     (floor-colour (make-colour 159 182 205))
+     (wall-colour (make-colour 0 0 0))
+     (goal-colour (make-colour 255 215 0))
+     (power-up-colour (make-colour 60 179 113))
      
      ; Brushes
      (no-brush (make-object brush% "WHITE" 'transparent))
@@ -37,14 +43,22 @@
      (green-brush (make-object brush% "GREEN" 'solid))
      (yellow-brush (make-object brush% "YELLOW" 'solid))
      (brown-brush (make-object brush% "BROWN" 'solid))
+     (player-brush (make-object brush% player-colour 'solid))
+     (block-brush (make-object brush% block-colour 'solid))
+     (floor-brush (make-object brush% floor-colour 'solid))
+     (wall-brush (make-object brush% wall-colour 'solid))
+     (goal-brush (make-object brush% goal-colour 'solid))
+     (power-up-brush (make-object brush% power-up-colour 'solid))
      
      ; Pens
      (no-pen (make-object pen% "WHITE" 1 'transparent))
      (background-pen (make-object pen% background-colour 1 'solid))
-     (black-pen (make-object pen% "BLACK" 2 'solid)))
+     (black-pen (make-object pen% "BLACK" 1 'solid))
+     (black-pen2 (make-object pen% "BLACK" 2 'solid)))
     
     ; #### Private ####
     
+    ; Ritar ett block med sitt övre vänstra hörn i position
     (define/private (draw-block position)
       (let ((draw-position (translate-position position)))
         (send dc draw-rectangle (get-x-position draw-position) (get-y-position draw-position) block-size block-size)
@@ -84,23 +98,25 @@
                 (if (eq? object-on-floor 'empty)
                   (let ((type (send floor-object get-type)))
                     (cond ((eq? type 'floor)
-                           (send dc set-brush blue-brush))
+                           (send dc set-brush floor-brush)
+                           (draw-block position))
                           ((eq? type 'wall)
-                           (send dc set-brush black-brush))
+                           (send dc set-brush wall-brush)
+                           (draw-block position))
                           ((eq? type 'goal)
-                           (send dc set-brush yellow-brush))
+                           (send dc set-brush goal-brush)
+                           (draw-block position))
                           ((eq? type 'void)
                            (void))
-                          (else (error "Invalid floor type:" type)))
-                    (draw-block position))
+                          (else (error "Invalid floor type:" type))))
                   
                   (let ((type (send object-on-floor get-type)))
                     (cond ((eq? type 'player)
-                           (send dc set-brush red-brush))
+                           (send dc set-brush player-brush))
                           ((eq? type 'block)
-                           (send dc set-brush brown-brush))
+                           (send dc set-brush block-brush))
                           ((eq? type 'power-up)
-                           (send dc set-brush green-brush))
+                           (send dc set-brush power-up-brush))
                           (else (error "Invalid floor-object-type:" type)))
                     (draw-block position)))
                 
@@ -112,7 +128,7 @@
               (iter-col 0)
               (iter-row (+ row 1)))))
       
-      (send dc set-pen no-pen)
+      ;(send dc set-pen no-pen)
       (iter-row 0))
                           
     
@@ -137,13 +153,5 @@
           (refresh)))
     
     (super-new)))
-
-(define graphical-object%
-  (class object%
-    
-    ; Konstruktorvärden
-    
-    (super-new)))
-    
 
   

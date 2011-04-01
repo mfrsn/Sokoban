@@ -90,7 +90,7 @@
   ;(send *player* set-position! position)
   ;(send *player* set-board! board))
 
-(define (add-player board position)
+(define (add-player! board position)
   (send board set-square! position (create-floor 'floor 'empty))
   (send board set-start-position! position))
   

@@ -32,12 +32,14 @@
 ; Konstanter
 (define width 800)
 (define height 480)
+(define victory #f)
 
 ; Skapar GUI:n och returnerar canvasobjektet.
 
 ; Skapar ett draw-objekt som definieras som objektet *game-canvas*
-; (make-gui) returnerar det canvasobjektet som ligger i vår frame.
-; draw-object% lägger den grafiska funktionaliteten till canvas.
+; (make-gui) returnerar det canvasobjekt som ligger i vår frame.
+; draw-object% lägger den grafiska funktionaliteten till vår canvas.
+
 
 (define *game-canvas* (new draw-object%
                            [canvas (make-gui width height)]
@@ -46,7 +48,9 @@
 ; NOTE: När vi byter bana måste följande hända:
 ; (send *game-canvas* set-board! --ny-nivå--)
 ; (send *game-canvas* redraw)
+; (set! victory #f)
 
 ; Vi måste vänta innan vi kan skicka draw...
 (sleep/yield 0.01)
 (send *game-canvas* draw)
+

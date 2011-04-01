@@ -15,13 +15,16 @@
     (define/override (on-char event)
       (let ((pressed-key (send event get-key-code)))
         (cond ((eq? pressed-key 'up)
-               (display "Du skickade spelaren uppåt!\n"))
+               (send *player* move! 'up))
               ((eq? pressed-key 'down)
-               (display "Du skickade spelaren nedåt!\n"))
+               (send *player* move! 'down))
               ((eq? pressed-key 'left)
-               (display "Du skickade spelaren åt vänster!\n"))
+               (send *player* move! 'left))
               ((eq? pressed-key 'right)
-               (display "Du skickade spelaren åt höger!\n"))
-              (else (void)))))
-    
+               (send *player* move! 'right))
+              (else (void)))
+        
+        ; Uppdatera brädet
+        (send *game-canvas* draw)))
+        
     (super-new)))

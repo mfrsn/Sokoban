@@ -88,6 +88,13 @@
                            [min-width width]
                            [min-height height]))
   
+  ; #### Vinstdialog #### - Används ej atm
+  (define win-dialog (new dialog%
+                          [label "Victory!"]))
+  (define win-message (new message%
+                           [parent win-dialog]
+                           [label "Congratulations! You beat the level!\nAlso: THE GAME!"]))
+  
   (send frame show #t)
   
   ; Returnerar game-canvas

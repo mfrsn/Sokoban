@@ -42,7 +42,7 @@
     
     (define/public (set-board! board)
       (set! current-board board)
-      (send board add-player this))
+      (send board add-player! this))
     
     ; Funktioner
     
