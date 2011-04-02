@@ -55,7 +55,8 @@
       (send player set-power-up! power-up)
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
-      (do-move! player player-position power-up-position))
+      (do-move! player player-position power-up-position)
+      (play-sound "utils/power-up.wav" #t))
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.
