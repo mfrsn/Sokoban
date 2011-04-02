@@ -1,6 +1,6 @@
 ;=======================================================
 ; PRAM 2011
-; Senaste ändring: add-player tillagd 2011-04-01
+; Senaste ändring: nödlösning till level-complete? 2011-04-02
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -79,6 +79,8 @@
         (cond ((null? list-of-goals)
                #t)
               ((eq? (send (mcar list-of-goals) get-object) 'empty)
+               #f)
+              ((not (eq? (send (send (mcar list-of-goals) get-object) get-type) 'block))
                #f)
               (else (goal-iter (mcdr list-of-goals)))))
       (goal-iter list-of-goals))
