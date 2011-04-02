@@ -24,7 +24,7 @@
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define *level-2* (parse-level-data (load-level-file "levels/level-1")))
+(define *level-2* (parse-level-data (load-level-file "levels/level-3")))
 (send *player* set-board! *level-2*)
 
 ; Starta GUI
