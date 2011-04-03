@@ -1,6 +1,6 @@
 ;=======================================================
 ; PRAM 2011
-; Senaste ändring: add-player tillagd 2011-04-01
+; Senaste ändring: nödlösning till level-complete? 2011-04-02
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -55,7 +55,8 @@
       (send player set-power-up! power-up)
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
-      (do-move! player player-position power-up-position))
+      (do-move! player player-position power-up-position)
+      (play-sound "utils/power-up.wav" #t))
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.
@@ -79,6 +80,8 @@
         (cond ((null? list-of-goals)
                #t)
               ((eq? (send (mcar list-of-goals) get-object) 'empty)
+               #f)
+              ((not (eq? (send (send (mcar list-of-goals) get-object) get-type) 'block))
                #f)
               (else (goal-iter (mcdr list-of-goals)))))
       (goal-iter list-of-goals))

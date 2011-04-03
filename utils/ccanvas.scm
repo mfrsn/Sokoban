@@ -25,6 +25,13 @@
               (else (void)))
         
         ; Uppdatera brädet
-        (send *game-canvas* draw)))
-        
+        (send *game-canvas* draw))
+      
+      ; TEMP vinstloop, *level-2* hårdkodat
+      (if (send *level-2* level-complete?)
+          (begin
+            (play-sound "utils/win-sound.wav" #t)
+            (send win-dialog show #t))
+          (void)))
+    
     (super-new)))

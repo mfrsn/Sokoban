@@ -24,7 +24,7 @@
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define *level-2* (parse-level-data (load-level-file "levels/level-3")))
+(define *level-2* (parse-level-data (load-level-file "levels/level-2")))
 (send *player* set-board! *level-2*)
 
 ; Starta GUI
@@ -33,17 +33,21 @@
 (define width 800)
 (define height 480)
 (define victory #f)
+(define player-name (void))
 
-; Skapar GUI:n och returnerar canvasobjektet.
+; Skapar GUI:n. (make-gui) returnerar ett par av frameobjektet
+; och det canvasobjekt som ligger i denna. 
+(define GUI (make-gui width height))
 
 ; Skapar ett draw-objekt som definieras som objektet *game-canvas*
-; (make-gui) returnerar det canvasobjekt som ligger i vår frame.
-; draw-object% lägger den grafiska funktionaliteten till vår canvas.
-
+; draw-object% lägger den grafiska funktionaliteten
+; till vår canvas.
 
 (define *game-canvas* (new draw-object%
-                           [canvas (make-gui width height)]
+                           [canvas (get-canvas GUI)]
                            [current-board *level-2*]))
+
+(define *game-frame* (get-frame GUI))
 
 ; NOTE: När vi byter bana måste följande hända:
 ; (send *game-canvas* set-board! --ny-nivå--)

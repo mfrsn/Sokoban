@@ -128,7 +128,6 @@
               (iter-col 0)
               (iter-row (+ row 1)))))
       
-      ;(send dc set-pen no-pen)
       (iter-row 0))
                           
     

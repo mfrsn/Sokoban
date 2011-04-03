@@ -25,23 +25,21 @@
                             [label "Reset"]
                             [parent top-panel]
                             [callback (lambda (button event)
-                                        (begin
-                                          (display "Här ska vi resetta nivån!\n")
-                                          (send game-canvas focus)))]))
+                                        (display "Här ska vi resetta nivån!\n")
+                                        (send game-canvas focus))]))
   
   (define button-restart (new button%
                               [label "Restart"]
                               [parent top-panel]
                               [callback (lambda (button event)
-                                          (begin
-                                            (display "Här ska vi starta om spelet!\n")
-                                            (send game-canvas focus)))]))
+                                          (display "Här ska vi starta om spelet!\n")
+                                          (send game-canvas focus))]))
   
   (define button-quit (new button%
                            [label "Quit"]
                            [parent top-panel]
                            [callback (lambda (button event)
-                                       (display "Här ska vi avsluta spelet!\n"))]))
+                                       (send frame show #f))]))
   
   (define button-set-name (new button%
                                [label "Set name"]
@@ -49,9 +47,7 @@
                                [callback (lambda (button event)
                                            (send player-name-dialog show #t))]))
   
-  ; #### Dialogruta för spelarens namn ####
-  (define player-name "Player")
-  
+  ; #### Dialogruta för spelarens namn ####  
   (define player-name-dialog (new dialog%
                                   [label "Name"]))
   
@@ -69,18 +65,16 @@
                          [parent dialog-panel]
                          [enabled #t]
                          [callback (lambda (button event)
-                                     (begin
-                                       (set! player-name (send name-field get-value))
-                                       (send player-name-dialog show #f)
-                                       (send game-canvas focus)))]))
+                                     (set! player-name (send name-field get-value))
+                                     (send player-name-dialog show #f)
+                                     (send game-canvas focus))]))
   
   (define cancel-button (new button%
                              [label "Cancel"]
                              [parent dialog-panel]
                              [callback (lambda (button event)
-                                         (begin
-                                           (send player-name-dialog show #f)
-                                           (send game-canvas focus)))]))
+                                         (send player-name-dialog show #f)
+                                         (send game-canvas focus))]))
   
   ; Definierar spelets canvas, förs samtidigt in i 'frame'
   (define game-canvas (new game-canvas%
@@ -88,14 +82,49 @@
                            [min-width width]
                            [min-height height]))
   
-  ; #### Vinstdialog #### - Används ej atm
-  (define win-dialog (new dialog%
-                          [label "Victory!"]))
-  (define win-message (new message%
-                           [parent win-dialog]
-                           [label "Congratulations! You beat the level!\nAlso: THE GAME!"]))
-  
   (send frame show #t)
   
   ; Returnerar game-canvas
-  game-canvas)
+  (cons frame game-canvas))
+
+; Selektorer
+(define (get-frame GUI)
+  (car GUI))
+
+(define (get-canvas GUI)
+  (cdr GUI))
+
+
+; #### Vinstdialog #### Måste vara global för att kunna kalla på
+; (send win-dialog show #t) vid vinst.
+
+(define win-dialog (new dialog%
+                        [label "Victory!"]
+                        [width 200]
+                        [alignment '(center center)]
+                        [stretchable-width #t]
+                        [stretchable-height #f]))
+
+(define win-message (new message%
+                         [parent win-dialog]
+                         [label "Congratulations! You beat the level!"]))
+
+(define win-dialog-panel (new horizontal-panel%
+                              [parent win-dialog]
+                              [alignment '(center center)]))
+
+(define next-level-button (new button%
+                               [label "Next level"]
+                               [parent win-dialog-panel]
+                               [callback (lambda (button event)
+                                           (display "Här går vi vidare!"))]))
+
+(define quit-button (new button%
+                         [label "Quit"]
+                         [parent win-dialog-panel]
+                         [callback (lambda (button event)
+                                     (send win-dialog show #f)
+                                     (send *game-frame* show #f))]))
+
+
+  
