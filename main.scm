@@ -1,60 +1,510 @@
-;=====================================================
-; PRAM 2011, Senast ändrad 2011-04-01
-; Projekt: Sokoban
-; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
-;
-; Fil: main.scm
-; Beskrivning: Ingångspunkt för programmet.
-;=====================================================
+#reader(lib"read.ss""wxme")WXME0108 ## 
+#|
+   This file uses the GRacket editor format.
+   Open this file in DrRacket version 5.0.2 or later to read it.
 
-(load "utils/position.scm")
-(load "utils/carray.scm")
-(load "utils/level-init.scm")
-(load "utils/GUI.scm")
-(load "utils/ccanvas.scm")
-(load "utils/draw.scm")
+   Most likely, it was created by saving a program in DrRacket,
+   and it probably contains a program with non-text elements
+   (such as images or comment boxes).
 
-(load "datatypes/board.scm")
-(load "datatypes/floor.scm")
-(load "datatypes/player.scm")
-(load "datatypes/power-up.scm")
-(load "datatypes/block.scm")
-
-(define *player* (new player%
-                      [current-position 'unknown]
-                      [current-board 'none]))
-
-(define *level-2* (parse-level-data (load-level-file "levels/level-2")))
-(send *player* set-board! *level-2*)
-
-; Starta GUI
-
-; Konstanter
-(define width 800)
-(define height 480)
-(define victory #f)
-(define player-name (void))
-
-; Skapar GUI:n. (make-gui) returnerar ett par av frameobjektet
-; och det canvasobjekt som ligger i denna. 
-(define GUI (make-gui width height))
-
-; Skapar ett draw-objekt som definieras som objektet *game-canvas*
-; draw-object% lägger den grafiska funktionaliteten
-; till vår canvas.
-
-(define *game-canvas* (new draw-object%
-                           [canvas (get-canvas GUI)]
-                           [current-board *level-2*]))
-
-(define *game-frame* (get-frame GUI))
-
-; NOTE: När vi byter bana måste följande hända:
-; (send *game-canvas* set-board! --ny-nivå--)
-; (send *game-canvas* redraw)
-; (set! victory #f)
-
-; Vi måste vänta innan vi kan skicka draw...
-(sleep/yield 0.01)
-(send *game-canvas* draw)
-
+            http://racket-lang.org/
+|#
+ 28 7 #"wxtext\0"
+3 1 6 #"wxtab\0"
+1 1 8 #"wxmedia\0"
+4 1 8 #"wximage\0"
+2 0 34 #"(lib \"syntax-browser.ss\" \"mrlib\")\0"
+1 0 16 #"drscheme:number\0"
+3 0 44 #"(lib \"number-snip.ss\" \"drscheme\" \"private\")\0"
+1 0 36 #"(lib \"comment-snip.ss\" \"framework\")\0"
+1 0 43 #"(lib \"collapsed-snipclass.ss\" \"framework\")\0"
+0 0 19 #"drscheme:sexp-snip\0"
+0 0 36 #"(lib \"cache-image-snip.ss\" \"mrlib\")\0"
+1 0 30 #"(lib \"image-core.ss\" \"mrlib\")\0"
+1 0 33 #"(lib \"bullet-snip.ss\" \"browser\")\0"
+0 0 29 #"drscheme:bindings-snipclass%\0"
+1 0 25 #"(lib \"matrix.ss\" \"htdp\")\0"
+1 0 22 #"drscheme:lambda-snip%\0"
+1 0 57
+#"(lib \"hrule-snip.rkt\" \"macro-debugger\" \"syntax-browser\")\0"
+1 0 45 #"(lib \"image-snipr.ss\" \"slideshow\" \"private\")\0"
+1 0 26 #"drscheme:pict-value-snip%\0"
+0 0 38 #"(lib \"pict-snipclass.ss\" \"slideshow\")\0"
+2 0 55 #"(lib \"vertical-separator-snip.ss\" \"stepper\" \"private\")\0"
+1 0 18 #"drscheme:xml-snip\0"
+1 0 31 #"(lib \"xml-snipclass.ss\" \"xml\")\0"
+1 0 21 #"drscheme:scheme-snip\0"
+2 0 34 #"(lib \"scheme-snipclass.ss\" \"xml\")\0"
+1 0 10 #"text-box%\0"
+1 0 32 #"(lib \"text-snipclass.ss\" \"xml\")\0"
+1 0 15 #"test-case-box%\0"
+2 0 1 6 #"wxloc\0"
+          0 0 47 0 1 #"\0"
+0 75 1 #"\0"
+0 10 90 -1 90 -1 3 -1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 255 255 255 1 -1 0 9
+#"Standard\0"
+0 75 12 #"Courier New\0"
+0 10 90 -1 90 -1 3 -1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 255 255 255 1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 1 1 1 1 1 1 0 0 0 0 0 0 -1 -1 2 24
+#"framework:default-color\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 150 0 150 0 0 0 -1 -1 2 15
+#"text:ports out\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 150 0 150 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1.0 0 -1 -1 93 -1 -1 -1 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 255 0 0 0 0 0 -1
+-1 2 15 #"text:ports err\0"
+0 -1 1 #"\0"
+1.0 0 -1 -1 93 -1 -1 -1 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 255 0 0 0 0 0 -1
+-1 2 1 #"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 175 0 0 0 -1 -1 2 17
+#"text:ports value\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 175 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1.0 0 92 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 34 139 34 0 0 0 -1
+-1 2 27 #"Matching Parenthesis Style\0"
+0 -1 1 #"\0"
+1.0 0 92 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 34 139 34 0 0 0 -1
+-1 2 1 #"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 38 38 128 0 0 0 -1 -1 2 37
+#"framework:syntax-color:scheme:symbol\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 38 38 128 0 0 0 -1 -1 2 38
+#"framework:syntax-color:scheme:keyword\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 38 38 128 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 194 116 31 0 0 0 -1 -1 2
+38 #"framework:syntax-color:scheme:comment\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 194 116 31 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 41 128 38 0 0 0 -1 -1 2 37
+#"framework:syntax-color:scheme:string\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 41 128 38 0 0 0 -1 -1 2 39
+#"framework:syntax-color:scheme:constant\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 41 128 38 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 132 60 36 0 0 0 -1 -1 2 42
+#"framework:syntax-color:scheme:parenthesis\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 132 60 36 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 255 0 0 0 0 0 -1 -1 2 36
+#"framework:syntax-color:scheme:error\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 255 0 0 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 -1 -1 2 36
+#"framework:syntax-color:scheme:other\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 81 112 203 0 0 0 -1 -1 2
+38 #"drracket:check-syntax:lexically-bound\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 81 112 203 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 178 34 34 0 0 0 -1 -1 2 28
+#"drracket:check-syntax:set!d\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 178 34 34 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 68 0 203 0 0 0 -1 -1 2 31
+#"drracket:check-syntax:imported\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 68 0 203 0 0 0 -1 -1 2 47
+#"drracket:check-syntax:my-obligation-style-pref\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 178 34 34 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 116 0 0 0 0 -1 -1 2 50
+#"drracket:check-syntax:their-obligation-style-pref\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 116 0 0 0 0 -1 -1 2 48
+#"drracket:check-syntax:unk-obligation-style-pref\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 0 0 0 0 0 0 -1 -1 2 1
+#"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 139 142 28 0 0 0 -1 -1 2
+49 #"drracket:check-syntax:both-obligation-style-pref\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 139 142 28 0 0 0 -1 -1 4 1
+#"\0"
+0 70 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0
+-1 -1 4 4 #"XML\0"
+0 70 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0
+-1 -1 4 1 #"\0"
+0 71 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 1.0 1.0 1.0 1.0 1.0 1.0 0 0 0 0 0 0
+-1 -1 4 1 #"\0"
+0 -1 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 1 0 0 0 0 0 0 0 0 1.0 1.0 1.0 0 0 255 0 0 0 -1
+-1 4 1 #"\0"
+0 71 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 1 0 0 0 0 0 0 0 0 1.0 1.0 1.0 0 0 255 0 0 0 -1
+-1 4 1 #"\0"
+0 71 1 #"\0"
+1.0 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1.0 1.0 1.0 0 100 0 0 0 0 -1
+-1 0 1 #"\0"
+0 75 12 #"Courier New\0"
+0.0 10 90 -1 90 -1 3 -1 0 1 0 1 0 0 0.0 0.0 0.0 0.0 0.0 0.0 0 0 0 255
+255 255 1 -1 0 1 #"\0"
+0 -1 1 #"\0"
+1 0 -1 -1 -1 -1 -1 -1 0 0 0 0 0 0 0 0 0 1 1 1 200 0 0 0 0 0 -1 -1
+          0 270 0 17 3 54
+#";====================================================="
+0 0 4 29 1 #"\n"
+0 0 17 3 38 #"; PRAM 2011, Senast \303\244ndrad 2011-04-01"
+0 0 4 29 1 #"\n"
+0 0 17 3 18 #"; Projekt: Sokoban"
+0 0 4 29 1 #"\n"
+0 0 17 3 49 #"; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a"
+0 0 4 29 1 #"\n"
+0 0 17 3 1 #";"
+0 0 4 29 1 #"\n"
+0 0 17 3 15 #"; Fil: main.scm"
+0 0 4 29 1 #"\n"
+0 0 17 3 45 #"; Beskrivning: Ing\303\245ngspunkt f\303\266r programmet."
+0 0 4 29 1 #"\n"
+0 0 17 3 54 #";====================================================="
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 20 #"\"utils/position.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 18 #"\"utils/carray.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 22 #"\"utils/level-init.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 15 #"\"utils/GUI.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 19 #"\"utils/ccanvas.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 16 #"\"utils/draw.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 21 #"\"datatypes/board.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 21 #"\"datatypes/floor.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 22 #"\"datatypes/player.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 24 #"\"datatypes/power-up.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"load"
+0 0 4 3 1 #" "
+0 0 19 3 21 #"\"datatypes/block.scm\""
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 8 #"*player*"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 3 #"new"
+0 0 4 3 1 #" "
+0 0 14 3 7 #"player%"
+0 0 4 29 1 #"\n"
+0 0 4 3 22 #"                      "
+0 0 22 3 1 #"["
+0 0 14 3 16 #"current-position"
+0 0 4 3 1 #" "
+0 0 20 3 1 #"'"
+0 0 14 3 7 #"unknown"
+0 0 22 3 1 #"]"
+0 0 4 29 1 #"\n"
+0 0 4 3 22 #"                      "
+0 0 22 3 1 #"["
+0 0 14 3 13 #"current-board"
+0 0 4 3 1 #" "
+0 0 20 3 1 #"'"
+0 0 14 3 4 #"none"
+0 0 22 3 3 #"]))"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 9 #"*level-2*"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 16 #"parse-level-data"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 15 #"load-level-file"
+0 0 4 3 1 #" "
+0 0 19 3 16 #"\"levels/level-2\""
+0 0 22 3 3 #")))"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"send"
+0 0 4 3 1 #" "
+0 0 14 3 8 #"*player*"
+0 0 4 3 1 #" "
+0 0 14 3 10 #"set-board!"
+0 0 4 3 1 #" "
+0 0 14 3 9 #"*level-2*"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 12 #"; Starta GUI"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 12 #"; Konstanter"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 5 #"width"
+0 0 4 3 1 #" "
+0 0 20 3 3 #"800"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 6 #"height"
+0 0 4 3 1 #" "
+0 0 20 3 3 #"480"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 7 #"victory"
+0 0 4 3 1 #" "
+0 0 20 3 2 #"#f"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 11 #"player-name"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 4 #"void"
+0 0 22 3 2 #"))"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 62
+#"; Skapar GUI:n. (make-gui) returnerar ett par av frameobjektet"
+0 0 4 29 1 #"\n"
+0 0 17 3 43 #"; och det canvasobjekt som ligger i denna. "
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 3 #"GUI"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 8 #"make-gui"
+0 0 4 3 1 #" "
+0 0 14 3 5 #"width"
+0 0 4 3 1 #" "
+0 0 14 3 6 #"height"
+0 0 22 3 2 #"))"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 66
+#"; Skapar ett draw-objekt som definieras som objektet *game-canvas*"
+0 0 4 29 1 #"\n"
+0 0 17 3 52
+#"; draw-object% l\303\244gger den grafiska funktionaliteten"
+0 0 4 29 1 #"\n"
+0 0 17 3 19 #"; till v\303\245r canvas."
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 13 #"*game-canvas*"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 3 #"new"
+0 0 4 3 1 #" "
+0 0 14 3 12 #"draw-object%"
+0 0 4 29 1 #"\n"
+0 0 4 3 27 #"                           "
+0 0 22 3 1 #"["
+0 0 14 3 6 #"canvas"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 10 #"get-canvas"
+0 0 4 3 1 #" "
+0 0 14 3 3 #"GUI"
+0 0 22 3 2 #")]"
+0 0 4 29 1 #"\n"
+0 0 4 3 27 #"                           "
+0 0 22 3 1 #"["
+0 0 14 3 13 #"current-board"
+0 0 4 3 1 #" "
+0 0 14 3 9 #"*level-2*"
+0 0 22 3 3 #"]))"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 4 3 1 #" "
+0 0 14 3 12 #"*game-frame*"
+0 0 4 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 9 #"get-frame"
+0 0 4 3 1 #" "
+0 0 14 3 3 #"GUI"
+0 0 22 3 2 #"))"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 51
+(
+ #"; NOTE: N\303\244r vi byter ban"
+ #"a m\303\245ste f\303\266ljande h\303\244nda:"
+) 0 0 4 29 1 #"\n"
+0 0 17 3 46 #"; (send *game-canvas* set-board! --ny-niv\303\245--)"
+0 0 4 29 1 #"\n"
+0 0 17 3 29 #"; (send *game-canvas* redraw)"
+0 0 4 29 1 #"\n"
+0 0 17 3 19 #"; (set! victory #f)"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 0 17 3 46
+#"; Vi m\303\245ste v\303\244nta innan vi kan skicka draw..."
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 11 #"sleep/yield"
+0 0 4 3 1 #" "
+0 0 20 3 4 #"0.01"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 4 #"send"
+0 0 4 3 1 #" "
+0 0 14 3 13 #"*game-canvas*"
+0 0 4 3 1 #" "
+0 0 14 3 4 #"draw"
+0 0 22 3 1 #")"
+0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0 7         301 4           0 0           0 49 0 17 3 16
+#"; Bakgrundsmusik"
+0 0 2 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 2 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 9 #"play-song"
+0 0 22 3 1 #")"
+0 0 2 29 1 #"\n"
+0 0 2 3 2 #"  "
+0 0 22 3 1 #"("
+0 0 14 3 10 #"play-sound"
+0 0 2 3 1 #" "
+0 0 19 3 26 #"\"utils/lost-in-a-maze.wav\""
+0 0 2 3 1 #" "
+0 0 20 3 2 #"#t"
+0 0 22 3 2 #"))"
+0 0 2 29 1 #"\n"
+0 0 2 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 15 3 6 #"define"
+0 0 2 3 1 #" "
+0 0 14 3 16 #"*playback-timer*"
+0 0 2 3 1 #" "
+0 0 22 3 1 #"("
+0 0 14 3 3 #"new"
+0 0 2 3 1 #" "
+0 0 14 3 6 #"timer%"
+0 0 2 29 1 #"\n"
+0 0 2 3 30 #"                              "
+0 0 22 3 1 #"["
+0 0 14 3 15 #"notify-callback"
+0 0 2 3 1 #" "
+0 0 14 3 9 #"play-song"
+0 0 22 3 1 #"]"
+0 0 2 29 1 #"\n"
+0 0 2 3 30 #"                              "
+0 0 22 3 1 #"["
+0 0 14 3 8 #"interval"
+0 0 2 3 1 #" "
+0 0 20 3 6 #"118375"
+0 0 22 3 3 #"]))"
+0 0 2 29 1 #"\n"
+0 0 22 3 1 #"("
+0 0 14 3 9 #"play-song"
+0 0 22 3 1 #")"
+0 0 2 29 1 #"\n"
+0 0 2 29 1 #"\n"
+0 0 17 3 62
+(
+ #"; (send *playback-timer* stop) m\303\245ste skickas n\303\244r vi av"
+ #"slutar"
+) 0           0 0 0 4 29 1 #"\n"
+0 0 4 29 1 #"\n"
+0           0
