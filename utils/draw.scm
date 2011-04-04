@@ -17,7 +17,7 @@
     ; Lokala fält
     (field 
      ; Funktionella variabler
-     (refresh? #f)
+     (refresh? #t)
      (canvas-width (send canvas get-width))
      (canvas-height (send canvas get-height))
      (map-width (send current-board get-width))
@@ -139,15 +139,18 @@
     
     ; Omritningsfunktion, kallas i samband med nivåbyte.
     (define/public (redraw)
-      (set! refresh? #f)
+      (set! refresh? #t)
+      (set! map-width (send current-board get-width))
+      (set! map-height (send current-board get-height))
+      (set! block-size (calculate-block-size))
       (draw))
     
     ; Den publika ritfunktionen
     (define/public (draw)
-      (if (not refresh?)
+      (if refresh?
           (begin
             (fill-canvas)
-            (set! refresh? #t)
+            (set! refresh? #f)
             (refresh))
           (refresh)))
     

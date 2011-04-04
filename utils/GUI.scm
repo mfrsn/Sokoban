@@ -117,7 +117,8 @@
                                [label "Next level"]
                                [parent win-dialog-panel]
                                [callback (lambda (button event)
-                                           (display "Här går vi vidare!"))]))
+                                           (load-level (next-level))
+                                           (send win-dialog show #f))]))
 
 (define quit-button (new button%
                          [label "Quit"]
