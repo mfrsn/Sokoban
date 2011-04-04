@@ -97,7 +97,9 @@
                 
                 (if (eq? object-on-floor 'empty)
                   (let ((type (send floor-object get-type)))
-                    (cond ((eq? type 'floor)
+                    (cond ((eq? type 'void)
+                           (void))
+                          ((eq? type 'floor)
                            (send dc set-brush floor-brush)
                            (draw-block position))
                           ((eq? type 'wall)
@@ -106,8 +108,6 @@
                           ((eq? type 'goal)
                            (send dc set-brush goal-brush)
                            (draw-block position))
-                          ((eq? type 'void)
-                           (void))
                           (else (error "Invalid floor type:" type))))
                   
                   (let ((type (send object-on-floor get-type)))

@@ -24,20 +24,20 @@
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define *level-2* (parse-level-data (load-level-file "levels/level-2")))
+(define *level-2* (parse-level-data (load-level-file "levels/level-1")))
 (send *player* set-board! *level-2*)
 
 ; Starta GUI
 
 ; Konstanter
-(define width 800)
-(define height 480)
-(define victory #f)
-(define player-name (void))
+(define *width* 800)
+(define *height* 480)
+(define *victory* #f)
+(define *player-name* (void))
 
 ; Skapar GUI:n. (make-gui) returnerar ett par av frameobjektet
 ; och det canvasobjekt som ligger i denna. 
-(define GUI (make-gui width height))
+(define GUI (make-gui *width* *height*))
 
 ; Skapar ett draw-objekt som definieras som objektet *game-canvas*
 ; draw-object% lägger den grafiska funktionaliteten

@@ -65,7 +65,7 @@
                          [parent dialog-panel]
                          [enabled #t]
                          [callback (lambda (button event)
-                                     (set! player-name (send name-field get-value))
+                                     (set! *player-name* (send name-field get-value))
                                      (send player-name-dialog show #f)
                                      (send game-canvas focus))]))
   
