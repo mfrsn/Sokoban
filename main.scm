@@ -58,3 +58,14 @@
 (sleep/yield 0.01)
 (send *game-canvas* draw)
 
+; Bakgrundsmusik
+;(define (play-song)
+;  (play-sound "utils/lost-in-a-maze.wav" #t))
+
+;(define *playback-timer* (new timer%
+;                              [notify-callback play-song]
+;                              [interval 118375]))
+;(play-song)
+
+; (send *playback-timer* stop) måste skickas när vi avslutar
+
