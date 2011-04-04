@@ -44,7 +44,7 @@
      (yellow-brush (make-object brush% "YELLOW" 'solid))
      (brown-brush (make-object brush% "BROWN" 'solid))
      (player-brush (make-object brush% player-colour 'solid))
-     (block-brush (make-object brush% block-colour 'crossdiag-hatch))
+     (block-brush (make-object brush% block-colour 'solid))
      (floor-brush (make-object brush% floor-colour 'solid))
      (wall-brush (make-object brush% wall-colour 'solid))
      (goal-brush (make-object brush% goal-colour 'solid))
