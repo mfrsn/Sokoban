@@ -25,14 +25,14 @@
                             [label "Reset"]
                             [parent top-panel]
                             [callback (lambda (button event)
-                                        (display "Här ska vi resetta nivån!\n")
+                                        (reset-level!)
                                         (send game-canvas focus))]))
   
   (define button-restart (new button%
                               [label "Restart"]
                               [parent top-panel]
                               [callback (lambda (button event)
-                                          (display "Här ska vi starta om spelet!\n")
+                                          (restart-game!)
                                           (send game-canvas focus))]))
   
   (define button-quit (new button%
@@ -117,7 +117,7 @@
                                [label "Next level"]
                                [parent win-dialog-panel]
                                [callback (lambda (button event)
-                                           (load-level (next-level))
+                                           (next-level!)
                                            (send win-dialog show #f))]))
 
 (define quit-button (new button%

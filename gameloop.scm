@@ -16,6 +16,7 @@
 (load "utils/GUI.scm")
 (load "utils/ccanvas.scm")
 (load "utils/draw.scm")
+(load "utils/helpers.scm")
 
 ; ADT:s
 (load "datatypes/board.scm")
@@ -27,22 +28,18 @@
 ;=========
 ; Init
 ;=========
+(define *game-data* (make-vector 3))
+(vector-set! *game-data* 0 (load-level-file "levels/level-1"))
+(vector-set! *game-data* 1 (load-level-file "levels/level-2"))
+(vector-set! *game-data* 2 (load-level-file "levels/level-3"))
 
-; Game board
 (define *player* (new player%
                       [current-position 'unknown]
                       [current-board 'none]))
 
-(define *level-1* (parse-level-data (load-level-file "levels/level-2")))
-(define *level-2* (parse-level-data (load-level-file "levels/level-1")))
-
-(define *current-level-id* 0)
-(define *level-list* (make-vector 2))
-
-(vector-set! *level-list* 0 *level-1*)
-(vector-set! *level-list* 1 *level-2*)
-
-(send *player* set-board! *level-1*)
+(define *current-level* 0)
+(define *current-board* (parse-level-data (get-board-data *current-level*)))
+(send *player* set-board! *current-board*)
 
 ; Gfx
 (define *width* 800)
@@ -53,8 +50,7 @@
 (define GUI (make-gui *width* *height*))
 
 (define *game-canvas* (new draw-object%
-                           [canvas (get-canvas GUI)]
-                           [current-board *level-1*]))
+                           [canvas (get-canvas GUI)]))
 
 (define *game-frame* (get-frame GUI))
 
@@ -79,25 +75,8 @@
   ; Do shit 'n stuff here
   (send *game-canvas* draw)
   
-  (if (send (current-level) level-complete?)
+  (if (send *current-board* level-complete?)
       (begin
         (play-sound "utils/win-sound.wav" #t)
         (send win-dialog show #t))
       (void)))
-
-;=========
-; Handles?
-;=========
-
-(define (next-level)
-  (set! *current-level-id* (+ *current-level-id* 1))
-  *current-level-id*)
-
-(define (current-level)
-  (vector-ref *level-list* *current-level-id*))
-
-(define (load-level level-id)
-  (let ((level (vector-ref *level-list* level-id)))
-    (send *game-canvas* set-board! level)
-    (send *player* set-board! level)
-    (send *game-canvas* redraw)))

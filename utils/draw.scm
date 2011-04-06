@@ -11,8 +11,7 @@
   (class object%
     
     ; Konstruktorvärden
-    (init-field canvas
-                current-board)
+    (init-field canvas)
     
     ; Lokala fält
     (field 
@@ -20,9 +19,10 @@
      (refresh? #t)
      (canvas-width (send canvas get-width))
      (canvas-height (send canvas get-height))
-     (map-width (send current-board get-width))
-     (map-height (send current-board get-height))
-     (block-size (calculate-block-size))
+     (map-width (send *current-board* get-width))
+     (map-height (send *current-board* get-height))
+     ;(block-size (calculate-block-size))
+     (block-size 36)
      (dc (send canvas get-dc))
      
      ; Konstanta verktyg
@@ -92,7 +92,7 @@
           (if (= col map-width)
               (void)
               (let* ((position (make-position col row))
-                     (floor-object (send current-board get-object position))
+                     (floor-object (send *current-board* get-object position))
                      (object-on-floor (send floor-object get-object)))
                 
                 (if (eq? object-on-floor 'empty)
@@ -133,16 +133,12 @@
     
     ; #### Public ####
     
-    ; Sätter current-board till new-board
-    (define/public (set-board! new-board)
-      (set! current-board new-board))
-    
     ; Omritningsfunktion, kallas i samband med nivåbyte.
     (define/public (redraw)
       (set! refresh? #t)
-      (set! map-width (send current-board get-width))
-      (set! map-height (send current-board get-height))
-      (set! block-size (calculate-block-size))
+      (set! map-width (send *current-board* get-width))
+      (set! map-height (send *current-board* get-height))
+      ;(set! block-size (calculate-block-size))
       (draw))
     
     ; Den publika ritfunktionen
@@ -153,6 +149,10 @@
             (set! refresh? #f)
             (refresh))
           (refresh)))
+    
+    ; TEMP
+    (define/public (get-block-size)
+      block-size)
     
     (super-new)))
 
