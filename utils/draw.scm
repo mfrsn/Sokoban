@@ -34,6 +34,11 @@
      (goal-colour (make-colour 255 215 0))
      (power-up-colour (make-colour 60 179 113))
      
+     ; PNGs
+     (player-png (make-object bitmap% "textures/player.png" 'png/mask))
+     (block-png (make-object bitmap% "textures/block.png"))
+     
+     
      ; Brushes
      (no-brush (make-object brush% "WHITE" 'transparent))
      (background-brush (make-object brush% background-colour 'solid))
@@ -56,8 +61,11 @@
      (black-pen (make-object pen% "BLACK" 1 'solid))
      (black-pen2 (make-object pen% "BLACK" 2 'solid)))
     
-    ; #### Private ####
     
+    ; #### Private ####
+    ; Masks
+    (define player-mask (send player-png get-loaded-mask))
+   
     ; Ritar ett block med sitt övre vänstra hörn i position
     (define/private (draw-block position)
       (let ((draw-position (translate-position position)))
@@ -79,8 +87,18 @@
     (define/private (calculate-block-size)
       (min (floor (/ canvas-width map-width))
            (floor (/ canvas-height map-height))))
+    
+    ; Rita en bitmap
+    (define/private (draw-masked-png position png mask)
+      (let ((draw-position (translate-position position)))
+        (send dc draw-bitmap png (get-x-position draw-position) (get-y-position draw-position) 'solid floor-colour mask)))
+    
+    ; Rita en bitmap
+    (define/private (draw-png position png)
+      (let ((draw-position (translate-position position)))
+        (send dc draw-bitmap png (get-x-position draw-position) (get-y-position draw-position))))
       
-    ; Funktion som 
+    ; Funktion som
     (define/private (translate-position position)
       (make-position (* (get-x-position position) block-size)
                      (* (get-y-position position) block-size)))
@@ -112,13 +130,18 @@
                   
                   (let ((type (send object-on-floor get-type)))
                     (cond ((eq? type 'player)
-                           (send dc set-brush player-brush))
+                           ;(send dc set-brush player-brush))
+                           (if (eq? (send floor-object get-type) 'floor)
+                               (send dc set-brush floor-brush)
+                               (send dc set-brush goal-brush))
+                           (draw-block position)
+                           (draw-masked-png position player-png player-mask))
                           ((eq? type 'block)
-                           (send dc set-brush block-brush))
+                           (draw-png position block-png))
                           ((eq? type 'power-up)
-                           (send dc set-brush power-up-brush))
-                          (else (error "Invalid floor-object-type:" type)))
-                    (draw-block position)))
+                           (send dc set-brush power-up-brush)
+                           (draw-block position))
+                          (else (error "Invalid floor-object-type:" type)))))
                 
                 (iter-col (+ col 1)))))
         
