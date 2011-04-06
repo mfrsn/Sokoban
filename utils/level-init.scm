@@ -84,12 +84,7 @@
 (define (add-block board position)
   (send board set-square! position (create-block position)))
 
-; Lägger till spelaren
-;(define (add-player board position *player*)
-  ;(send board set-square! position (create-floor 'floor *player*))
-  ;(send *player* set-position! position)
-  ;(send *player* set-board! board))
-
+; Lägger till spelarens position på brädet
 (define (add-player! board position)
   (send board set-square! position (create-floor 'floor 'empty))
   (send board set-start-position! position))

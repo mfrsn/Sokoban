@@ -47,7 +47,8 @@
                  (check-square new-position))
             (begin
               (do-move! block block-position new-position)
-              (do-move! player player-position block-position))
+              (do-move! player player-position block-position)
+              (send *counter* increase!))
             (void))))
     
     ; Funktion som hanterar upptagning av power-up
@@ -56,7 +57,8 @@
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
       (do-move! player player-position power-up-position)
-      (play-sound "utils/power-up.wav" #t))
+      (send *counter* increase!)
+      (play-sound "data/sounds/power-up.wav" #t))
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.
@@ -122,8 +124,10 @@
              (check-square-result (check-square new-position)))
         (if (not check-square-result)
             (void)
-            (if (is-empty? new-position) ; not (object? check-square-result)
-                (do-move! object current-position new-position)
+            (if (is-empty? new-position)
+                (begin
+                  (do-move! object current-position new-position)
+                  (send *counter* increase!))
                 (if (eq? (send check-square-result get-type) 'block)
                     (handle-block-move object check-square-result current-position new-position direction)
                     (handle-power-up object check-square-result current-position new-position))))))
