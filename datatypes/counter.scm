@@ -11,13 +11,13 @@
 (define counter%
   (class object%
     
-    (init-field (board 'none)) ; Behöver vi vetskap om brädet?
+    (init-field (level #f))
     
     (field (count 0))
     
-    ; Se kommentar vid board-fältet..
-    (define/public (set-board! new-board)
-      (set! board new-board))
+    (define/public (set-level! new-level)
+      (set! level (+ new-level 1))
+      (reset!))
     
     (define/public (set-count! value)
       (set! count value))
@@ -34,8 +34,7 @@
     (define/public (get-count)
       count)
     
-    (define/public (report-score level player-name)
-      ;(skicka-till-server level player-name count)
-      ())
+    (define/public (report-score player-name)
+      (display "Level ")(display level)(display ": ")(display count)(newline))
     
     (super-new)))

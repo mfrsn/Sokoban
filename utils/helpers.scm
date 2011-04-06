@@ -17,6 +17,7 @@
 (define (load-level!)
   (set! *current-board* (parse-level-data (get-board-data *current-level*)))
   (send *player* set-board! *current-board*)
+  (send *counter* set-level! *current-level*)
   (send *game-canvas* redraw))
 
 ; Återställer nuvarande nivån
