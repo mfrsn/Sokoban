@@ -36,7 +36,10 @@
      
      ; PNGs
      (player-png (make-object bitmap% "data/textures/player.png" 'png/mask))
-     (block-png (make-object bitmap% "data/textures/block.png" 'png/mask))
+     (background-png (make-object bitmap% "data/textures/background.png"))
+     (block-png (make-object bitmap% "data/textures/block.png"))
+     (floor-png (make-object bitmap% "data/textures/floor.png"))
+     (goal-png (make-object bitmap% "data/textures/goal.png"))
      (wall-png (make-object bitmap% "data/textures/wall.png"))
      
      
@@ -66,7 +69,6 @@
     ; #### Private ####
     ; Masks
     (define player-mask (send player-png get-loaded-mask))
-    (define block-mask (send block-png get-loaded-mask))
    
     ; Ritar ett block med sitt övre vänstra hörn i position
     (define/private (draw-block position)
@@ -76,9 +78,10 @@
     
     ; Fyller hela canvas med background-colour
     (define/private (fill-canvas)
-      (send dc set-brush background-brush)
-      (send dc draw-rectangle 0 0 canvas-width canvas-height)
-      (send dc set-brush no-brush))
+      ;(send dc set-brush background-brush)
+      ;(send dc draw-rectangle 0 0 canvas-width canvas-height)
+      ;(send dc set-brush no-brush))
+      (draw-png (make-position 0 0) background-png))
     
     ; Funktion som skapar ett rgb-objekt
     (define/private (make-colour r g b)
@@ -120,31 +123,21 @@
                     (cond ((eq? type 'void)
                            (void))
                           ((eq? type 'floor)
-                           (send dc set-brush floor-brush)
-                           (draw-block position))
+                           (draw-png position floor-png))
                           ((eq? type 'wall)
-                           ;(send dc set-brush wall-brush)
-                           ;(draw-block position))
                            (draw-png position wall-png))
                           ((eq? type 'goal)
-                           (send dc set-brush goal-brush)
-                           (draw-block position))
+                           (draw-png position goal-png))
                           (else (error "Invalid floor type:" type))))
                   
                   (let ((type (send object-on-floor get-type)))
                     (cond ((eq? type 'player)
-                           ;(send dc set-brush player-brush))
                            (if (eq? (send floor-object get-type) 'floor)
-                               (send dc set-brush floor-brush)
-                               (send dc set-brush goal-brush))
-                           (draw-block position)
+                               (draw-png position floor-png)
+                               (draw-png position goal-png))
                            (draw-masked-png position player-png player-mask))
                           ((eq? type 'block)
-                           (if (eq? (send floor-object get-type) 'floor)
-                               (send dc set-brush floor-brush)
-                               (send dc set-brush goal-brush))
-                           (draw-block position)
-                           (draw-masked-png position block-png block-mask))
+                           (draw-png position block-png))
                           ((eq? type 'power-up)
                            (send dc set-brush power-up-brush)
                            (draw-block position))
