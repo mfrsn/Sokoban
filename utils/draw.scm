@@ -1,5 +1,7 @@
 ;=============================================================
-; PRAM 2011, Senast ändrad 2011-04-01
+; PRAM 2011
+; Senaste ändring: Implementerat stöd för animering 2011-04-08
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
@@ -7,6 +9,7 @@
 ; Beskrivning: Definierar de funktioner som sköter uppritning.
 ;=============================================================
 
+; Klass
 (define draw-object%
   (class object%
     
@@ -21,9 +24,10 @@
      (canvas-height (send canvas get-height))
      (map-width (send *current-board* get-width))
      (map-height (send *current-board* get-height))
-     ;(block-size (calculate-block-size))
      (block-size 36)
+     (gif-delay 50)
      (dc (send canvas get-dc))
+     (active-gifs '())
      
      ; Konstanta verktyg
      (background-colour (make-colour 0 34 102))
@@ -42,6 +46,12 @@
      (goal-png (make-object bitmap% "data/textures/goal.png"))
      (wall-png (make-object bitmap% "data/textures/wall.png"))
      
+     ; Gifs
+     (star-list (list (make-object bitmap% "data/animations/star/star1.png" 'png/mask)
+                      (make-object bitmap% "data/animations/star/star2.png" 'png/mask)
+                      (make-object bitmap% "data/animations/star/star3.png" 'png/mask)
+                      (make-object bitmap% "data/animations/star/star4.png" 'png/mask)
+                      (make-object bitmap% "data/animations/star/star5.png" 'png/mask)))
      
      ; Brushes
      (no-brush (make-object brush% "WHITE" 'transparent))
@@ -69,7 +79,7 @@
     ; #### Private ####
     ; Masks
     (define player-mask (send player-png get-loaded-mask))
-   
+    
     ; Ritar ett block med sitt övre vänstra hörn i position
     (define/private (draw-block position)
       (let ((draw-position (translate-position position)))
@@ -103,11 +113,44 @@
       (let ((draw-position (translate-position position)))
         (send dc draw-bitmap png (get-x-position draw-position) (get-y-position draw-position))))
       
-    ; Funktion som
+    ; Funktion som "översätter" en position ur board till en position på canvas
     (define/private (translate-position position)
       (make-position (* (get-x-position position) block-size)
                      (* (get-y-position position) block-size)))
     
+    ; Skapa en ny gif och för in denna i listan över aktiva gifs
+    ; (Associationslista med (position . gif%)
+    (define/private (make-new-gif position gif-list)
+      (set! active-gifs (cons (cons position 
+                                    (new gif%
+                                         [gif-list gif-list]
+                                         [delay gif-delay]
+                                         [position (translate-position position)]
+                                         [dc dc]
+                                         [background floor-png]))
+                              active-gifs)))
+    
+    ; Kontroll för redan aktiv gif
+    (define/private (check-active-gifs position)
+      (define (help lst)
+        (cond ((null? lst) #f)
+              ((equal? position (car (car lst))) #t)
+              (else (help (cdr lst)))))
+      (help active-gifs))
+    
+    ; Avsluta alla animeringar i active-gifs
+    ; rensar även active-gifs
+    (define/private (stop-all-animations)
+      (define (help lst)
+        (if (null? lst)
+            (void)
+            (begin
+              (send (cdr (car lst)) stop-animation)
+              (help (cdr lst)))))
+      (help active-gifs)
+      (set! active-gifs '()))
+    
+    ; Uppdateringsfunktion
     (define/private (refresh)
       (define (iter-row row)
         
@@ -139,8 +182,9 @@
                           ((eq? type 'block)
                            (draw-png position block-png))
                           ((eq? type 'power-up)
-                           (send dc set-brush power-up-brush)
-                           (draw-block position))
+                           (if (check-active-gifs position)
+                               (void)
+                               (make-new-gif position star-list)))
                           (else (error "Invalid floor-object-type:" type)))))
                 
                 (iter-col (+ col 1)))))
@@ -161,7 +205,7 @@
       (set! refresh? #t)
       (set! map-width (send *current-board* get-width))
       (set! map-height (send *current-board* get-height))
-      ;(set! block-size (calculate-block-size))
+      (stop-all-animations)
       (draw))
     
     ; Den publika ritfunktionen
@@ -173,9 +217,16 @@
             (refresh))
           (refresh)))
     
-    ; TEMP
-    (define/public (get-block-size)
-      block-size)
+    ; Avslutar animationen på en specifik koordinat
+    ; tar även bort detta element ur listan
+    (define/public (stop-animation position)
+      (define (help lst)
+        (cond ((null? lst) '())
+              ((equal? position (car (car lst)))
+               (send (cdr (car lst)) stop-animation)
+               (cdr lst))
+              (else (cons (car lst) (help (cdr lst))))))
+      (set! active-gifs (help active-gifs)))
     
     (super-new)))
 

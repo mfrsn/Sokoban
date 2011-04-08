@@ -1,13 +1,14 @@
-;=======================================================
+;============================================================
 ; PRAM 2011
-; Senaste ändring: nödlösning till level-complete? 2011-04-02
+; Senaste ändring: Implementerat stöd för animering
+; (power-up) 2011-04-08
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
 ; Fil: board.scm
 ; Beskrivning: Definierar den abstrakta datatypen Board
-;=======================================================
+;============================================================
 
 (require scheme/mpair)
 
@@ -56,6 +57,7 @@
       (send player set-power-up! power-up)
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
+      (send *game-canvas* stop-animation power-up-position)
       (do-move! player player-position power-up-position)
       (send *counter* increase!)
       (play-sound "data/sounds/power-up.wav" #t))

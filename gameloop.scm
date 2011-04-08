@@ -1,4 +1,4 @@
-;=====================================================
+;====================================================================
 ; PRAM 2011
 ; Senaste ändring: Ändrat i nivårepresentationen 2011-04-06
 ;
@@ -6,8 +6,8 @@
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
 ; Fil: gameloop.scm
-; Beskrivning: just testin shit'n'stuff
-;=====================================================
+; Beskrivning: Definierar vår gameloop, uppstart + globala variabler
+;====================================================================
 
 ; Utils
 (load "utils/position.scm")
@@ -17,6 +17,7 @@
 (load "utils/ccanvas.scm")
 (load "utils/draw.scm")
 (load "utils/helpers.scm")
+(load "utils/cgif.scm")
 
 ; ADT:s
 (load "datatypes/board.scm")
