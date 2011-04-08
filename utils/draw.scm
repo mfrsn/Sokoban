@@ -35,8 +35,9 @@
      (power-up-colour (make-colour 60 179 113))
      
      ; PNGs
-     (player-png (make-object bitmap% "textures/player.png" 'png/mask))
-     (block-png (make-object bitmap% "textures/block.png"))
+     (player-png (make-object bitmap% "data/textures/player.png" 'png/mask))
+     (block-png (make-object bitmap% "data/textures/block.png" 'png/mask))
+     (wall-png (make-object bitmap% "data/textures/wall.png"))
      
      
      ; Brushes
@@ -65,6 +66,7 @@
     ; #### Private ####
     ; Masks
     (define player-mask (send player-png get-loaded-mask))
+    (define block-mask (send block-png get-loaded-mask))
    
     ; Ritar ett block med sitt övre vänstra hörn i position
     (define/private (draw-block position)
@@ -121,8 +123,9 @@
                            (send dc set-brush floor-brush)
                            (draw-block position))
                           ((eq? type 'wall)
-                           (send dc set-brush wall-brush)
-                           (draw-block position))
+                           ;(send dc set-brush wall-brush)
+                           ;(draw-block position))
+                           (draw-png position wall-png))
                           ((eq? type 'goal)
                            (send dc set-brush goal-brush)
                            (draw-block position))
@@ -137,9 +140,11 @@
                            (draw-block position)
                            (draw-masked-png position player-png player-mask))
                           ((eq? type 'block)
-                           ;(draw-png position block-png))
-                           (send dc set-brush block-brush)
-                           (draw-block position))
+                           (if (eq? (send floor-object get-type) 'floor)
+                               (send dc set-brush floor-brush)
+                               (send dc set-brush goal-brush))
+                           (draw-block position)
+                           (draw-masked-png position block-png block-mask))
                           ((eq? type 'power-up)
                            (send dc set-brush power-up-brush)
                            (draw-block position))
