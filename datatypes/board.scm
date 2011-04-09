@@ -60,7 +60,8 @@
       (send *game-canvas* stop-animation power-up-position)
       (do-move! player player-position power-up-position)
       (send *counter* increase!)
-      (play-sound "data/sounds/power-up.wav" #t))
+      (play-sound "data/sounds/power-up.wav" #t)
+      (send *game-canvas* run-animation power-up-position))
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.

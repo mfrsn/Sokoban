@@ -1,6 +1,6 @@
 ;==================================================
 ; PRAM 2011
-; Senaste ändring: Skapat klassen gif% 2011-04-08
+; Senaste ändring: Skapat klassen gif% 2011-04-09
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -16,20 +16,23 @@
                 delay       ; Angivet i millisekunder
                 position    ; Gifens position på canvas
                 dc          ; Canvas drawing-context
-                background) ; Anger objektets bakgrund på brädet
+                background  ; Anger objektets bakgrund på brädet
+                style       ; Anger animationens style
+                (object #f)); Om animationen sker "ovanpå" spelaren används denna
     
     
     (field (mask-list '())       ; Lista med masks  
            (draw-list gif-list)  ; Lista med alla bilder som utgör gifen
            (drawn-list '())      ; Lista dit redan ritade bilder förs över
            (masked-list '())     ; Lista dit redan använda masks förs över
+           (object-mask '())     ; Spelarens mask
            (x-position (get-x-position position)) ; Gifens x-position på canvas
            (y-position (get-y-position position)) ; Gifens y-position på canvas
            (block-size 36)  ; Den konstanta blockstorleken
            (black (make-object color% 0 0 0))) ; En nödvändig definition för utritning med mask
            
     ; #### Private ####
-        
+    
     ; Egen appendfunktion som tar ett element och lägger detta sist i en lista
     (define/private (my-append element lst)
       (append lst (list element)))
@@ -48,9 +51,18 @@
             '()
             (append (list (send (car gif-list) get-loaded-mask)) (help (cdr gif-list)))))
       (help gif-list))
-    ; Kör ovanstende funktion
-    (set! mask-list (make-mask-list))
     
+    (define/private (set-up)
+      (set! mask-list (make-mask-list))
+      (if (not object)
+          (void)
+          (begin
+            (set! object-mask (send object get-loaded-mask))
+            (send *game-canvas* enable #f))))
+    
+    
+    ; #### Exekvering ####
+    (set-up)
     
     ; TESTSYFTE
     (define/private (draw-all lst y)
@@ -81,15 +93,28 @@
     ; Rita
     (define (draw)
       (cond ((null? draw-list)
-             (set! draw-list (reverse-order drawn-list))
-             (set! drawn-list '())
-             (set! mask-list (reverse-order masked-list))
-             (set! masked-list '())
-             (send dc draw-bitmap background x-position y-position)
-             (send dc draw-bitmap (car draw-list) x-position y-position 'solid black (car mask-list)))
+             (if (eq? style 'continuous)
+                 (begin
+                   (set! draw-list (reverse-order drawn-list))
+                   (set! drawn-list '())
+                   (set! mask-list (reverse-order masked-list))
+                   (set! masked-list '())
+                   (send dc draw-bitmap background x-position y-position)
+                   (send dc draw-bitmap (car draw-list) x-position y-position 'solid black (car mask-list)))
+                 (begin
+                   (send animation-timer stop)
+                   (send *game-canvas* enable #t)
+                   (send *game-canvas* focus)
+                   (send *game-canvas* draw))))
             (else
-             (send dc draw-bitmap background x-position y-position)
-             (send dc draw-bitmap (car draw-list) x-position y-position 'solid black (car mask-list))
+             (if (not object)
+                 (begin
+                   (send dc draw-bitmap background x-position y-position)
+                   (send dc draw-bitmap (car draw-list) x-position y-position 'solid black (car mask-list)))
+                 (begin
+                   (send dc draw-bitmap background x-position y-position)
+                   (send dc draw-bitmap object x-position y-position 'solid black object-mask)
+                   (send dc draw-bitmap (car draw-list) x-position y-position 'solid black (car mask-list))))
              (set! drawn-list (cons (car draw-list) drawn-list))
              (set! draw-list (cdr draw-list))
              (set! masked-list (cons (car mask-list) masked-list))
