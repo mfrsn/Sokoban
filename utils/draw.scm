@@ -1,6 +1,6 @@
 ;=============================================================
 ; PRAM 2011
-; Senaste ändring: Implementerat stöd för animering 2011-04-08
+; Senaste ändring: Implementerat stöd för animering 2011-04-09
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -52,6 +52,15 @@
                       (make-object bitmap% "data/animations/star/star3.png" 'png/mask)
                       (make-object bitmap% "data/animations/star/star4.png" 'png/mask)
                       (make-object bitmap% "data/animations/star/star5.png" 'png/mask)))
+     
+     (blink-list (list (make-object bitmap% "data/animations/blink/gif1.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif2.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif3.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif4.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif5.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif6.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif7.png" 'png/mask)
+                       (make-object bitmap% "data/animations/blink/gif8.png" 'png/mask)))                       
      
      ; Brushes
      (no-brush (make-object brush% "WHITE" 'transparent))
@@ -118,17 +127,29 @@
       (make-position (* (get-x-position position) block-size)
                      (* (get-y-position position) block-size)))
     
-    ; Skapa en ny gif och för in denna i listan över aktiva gifs
+    ; Skapar en ny gif och för in denna i listan över aktiva gifs
     ; (Associationslista med (position . gif%)
-    (define/private (make-new-gif position gif-list)
+    (define/private (make-new-gif position gif-list style)
       (set! active-gifs (cons (cons position 
                                     (new gif%
                                          [gif-list gif-list]
                                          [delay gif-delay]
                                          [position (translate-position position)]
                                          [dc dc]
-                                         [background floor-png]))
+                                         [background floor-png]
+                                         [style style]))
                               active-gifs)))
+    
+    ; Skapar en ny gif-animering som ligger ovanpå ett objekt
+    (define/private (make-new-animation position gif-list object-png)
+      (new gif%
+           [gif-list gif-list]
+           [delay 50]
+           [position (translate-position position)]
+           [dc dc]
+           [background floor-png]
+           [style 'once]
+           [object object-png]))
     
     ; Kontroll för redan aktiv gif
     (define/private (check-active-gifs position)
@@ -184,7 +205,7 @@
                           ((eq? type 'power-up)
                            (if (check-active-gifs position)
                                (void)
-                               (make-new-gif position star-list)))
+                               (make-new-gif position star-list 'continuous)))
                           (else (error "Invalid floor-object-type:" type)))))
                 
                 (iter-col (+ col 1)))))
@@ -227,6 +248,20 @@
                (cdr lst))
               (else (cons (car lst) (help (cdr lst))))))
       (set! active-gifs (help active-gifs)))
+    
+    ; Lås eller aktivera inputmöjligheter till canvas
+    (define/public (enable bool)
+      (send canvas enable bool))
+    
+    ; Sätt fokus till canvas
+    (define/public (focus)
+      (send canvas focus))
+    
+    ; Kör en animation som ligger "ovanpå" spelaren ytterligare args vid utbyggnad:
+    ; 'gif-identifier (vilken animation?) bestämmer vilken gif-lista som skickas med
+    ; 'object-identifier (på vilket objekt ligger animationen?)
+    (define/public (run-animation position)
+      (make-new-animation position blink-list player-png))
     
     (super-new)))
 
