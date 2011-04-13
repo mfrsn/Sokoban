@@ -19,7 +19,8 @@
     
     ; Lokala fält
     (field (type 'player)
-           (current-power-up 'empty)) ; till en procedur som lagras hos spelaren?
+           (power-ups '())
+           (power-up-queue 'empty)) ; Lista som lagrar power-up-procedurer
     
     ; #### Private ####
     
@@ -34,8 +35,8 @@
       type)
     
     ; Setters
-    (define/public (set-power-up! power-up)
-      (set! current-power-up power-up))
+    (define/public (add-power-up! power-up)
+      (set! power-ups (cons power-up power-ups)))
     
     (define/public (set-position! position)
       (set! current-position position))
@@ -44,19 +45,24 @@
       (set! current-board board)
       (send board add-player! this))
     
+    (define/public (clear-power-up-queue!)
+      (set! power-up-queue 'empty))
+    
     ; Funktioner
     
     ; Flyttar spelaren
     (define/public (move! direction)
       (send current-board move! this direction))
     
-    ; Använder spelarens power-up
+    ; Använder spelarens power-up ; BROKEN!
     (define/public (use-power-up)
-      (if (eq? current-power-up 'empty)
-          (error "Called use-power-up with no power-up")
-          (begin
-            ((send current-power-up get-power-up-procedure))
-            (set-power-up! 'empty))))
-                     
-    
+      (let* ((power-up (car power-ups))
+             (type (send power-up get-type)))
+        (cond ((null? power-up-procedures) (display "No power-up")) ; Meddelande om ingen power-up här
+              ((eq? type 'teleport)
+               (set! power-up-queue (send power-up get-power-up-procedure))
+               (set! power-ups (cdr power-ups)))
+              (else (error "Unknown power-up type" type)))))
+              
+              
     (super-new)))

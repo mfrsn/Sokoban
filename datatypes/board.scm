@@ -44,17 +44,16 @@
     ; Funktion som hanterar förflyttning av block och spelare
     (define/private (handle-block-move player block player-position block-position direction)
       (let ((new-position (calc-new-position block-position direction)))
-        (if (and (is-empty? new-position)
-                 (check-square new-position))
-            (begin
-              (do-move! block block-position new-position)
-              (do-move! player player-position block-position)
-              (send *counter* increase!))
-            (void))))
+        (cond ((and (is-empty? new-position)
+                    (check-square new-position))
+               (do-move! block block-position new-position)
+               (do-move! player player-position block-position)
+               (send *counter* increase!))
+              (else (void)))))
     
     ; Funktion som hanterar upptagning av power-up
     (define/private (handle-power-up player power-up player-position power-up-position)
-      (send player set-power-up! power-up)
+      (send player add-power-up! power-up)
       (send power-up set-position! 'player)
       (send (get-object power-up-position) delete-object!)
       (send *game-canvas* stop-animation power-up-position)

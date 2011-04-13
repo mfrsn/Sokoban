@@ -75,6 +75,8 @@
          (send *player* move! 'left))
         ((eq? key 'right)
          (send *player* move! 'right))
+        ((eq? key #\p)
+         (send *player* use-power-up))
         (else (void)))
 
   ; Do shit 'n stuff here

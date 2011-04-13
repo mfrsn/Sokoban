@@ -12,7 +12,8 @@
     
     ; Konstruktorvärden
     (init-field current-position
-                power-up-procedure)
+                power-up-procedure
+                sub-type)
     
     ; Lokala fält
     (field (type 'power-up))
@@ -25,6 +26,9 @@
     
     (define/public (get-type)
       type)
+    
+    (define/public (get-sub-type)
+      sub-type)
     
     ; Setters
     (define/public (set-position! position)

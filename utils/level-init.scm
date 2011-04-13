@@ -97,5 +97,6 @@
                              (new power-up%
                                   [current-position position]
                                   [power-up-procedure (lambda ()
-                                                        (display "Teleportin mah block"))]))))
+                                                        (display "Teleportin mah block"))]
+                                  [sub-type 'teleport]))))
          (else (error "Invalid power-up attribute. Given:" attribute))))
