@@ -100,12 +100,3 @@
         (send *counter* report-score *player-name*)
         (send win-dialog show #t))
       (void)))
-
-
-(define (handle-mouse-event event)
-  (cond ((eq? event 'leave)
-         (send *game-canvas* focus)
-         (display "Left"))
-        ((eq? event 'enter)
-         (send *game-menu* focus)
-         (display "Entered"))))
