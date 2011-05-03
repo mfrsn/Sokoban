@@ -1,7 +1,7 @@
 ;============================================================
 ; PRAM 2011
-; Senaste ändring: Implementerat stöd för animering
-; (power-up) 2011-04-08
+; Senaste ändring: Implementerat power-up funktionalitet
+; 2011-04-08
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -41,10 +41,21 @@
     (define/private (is-empty? position)
       (eq? (send (get-object position) get-object) 'empty))
     
+    ; Kontrollerar om ett objekt redan är på en målruta
+    (define/private (on-goal? position)
+      (eq? (send (get-object position) get-type) 'goal))
+    
     ; Funktion som hanterar förflyttning av block och spelare
     (define/private (handle-block-move player block player-position block-position direction)
-      (let ((new-position (calc-new-position block-position direction)))
-        (cond ((and (is-empty? new-position)
+      (let ((new-position (calc-new-position block-position direction))
+            (power-up-queue (send player get-power-up-queue)))
+        (cond ((and (eq? power-up-queue 'teleport)
+                    (not (on-goal? block-position)))
+               (do-move! block block-position (first-available-goal-position))
+               (do-move! player player-position block-position)
+               (send player clear-power-up-queue!)
+               (send *counter* increase!))
+              ((and (is-empty? new-position)
                     (check-square new-position))
                (do-move! block block-position new-position)
                (do-move! player player-position block-position)
@@ -109,6 +120,15 @@
     ; Returnerar brädets höjd
     (define/public (get-height)
       size-y)
+    
+    ; Returnerar koordinaterna till första lediga målruta
+    (define/private (first-available-goal-position)
+      (define (help list-of-goals)
+        (cond ((null? list-of-goals) (error "Alla målrutor är upptagna"))
+              ((eq? (send (mcar list-of-goals) get-object) 'empty)
+               (send (mcar list-of-goals) get-position))
+              (else (help (mcdr list-of-goals)))))
+      (help list-of-goals))
     
     ; Returnerar golv-objektet på position
     (define/public (get-object position)

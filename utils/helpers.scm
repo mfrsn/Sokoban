@@ -17,8 +17,10 @@
 (define (load-level!)
   (set! *current-board* (parse-level-data (get-board-data *current-level*)))
   (send *player* set-board! *current-board*)
+  (send *player* clear-power-ups!)
   (send *counter* set-level! *current-level*)
-  (send *game-canvas* redraw))
+  (send *game-canvas* redraw)
+  (send *game-sidebar* draw))
 
 ; Återställer nuvarande nivån
 (define (reset-level!)

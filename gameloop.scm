@@ -1,6 +1,6 @@
 ;====================================================================
 ; PRAM 2011
-; Senaste ändring: Ändrat i nivårepresentationen 2011-04-06
+; Senaste ändring: Power-up funktionalitet implementerad 2011-04-17
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -18,6 +18,8 @@
 (load "utils/draw.scm")
 (load "utils/helpers.scm")
 (load "utils/cgif.scm")
+(load "utils/cmenu.scm")
+(load "utils/draw-menu.scm")
 
 ; ADT:s
 (load "datatypes/board.scm")
@@ -30,9 +32,9 @@
 ; Ladda in nivåfilerna
 (define *number-of-maps* 3)
 (define *game-data* (make-vector *number-of-maps*))
-(vector-set! *game-data* 0 (load-level-file "levels/level-2"))
-(vector-set! *game-data* 1 (load-level-file "levels/level-3"))
-(vector-set! *game-data* 2 (load-level-file "levels/level-1"))
+(vector-set! *game-data* 0 (load-level-file "levels/level-1"))
+(vector-set! *game-data* 1 (load-level-file "levels/level-2"))
+(vector-set! *game-data* 2 (load-level-file "levels/level-3"))
 
 ; Skapa spelaren
 (define *player* (new player%
@@ -50,20 +52,29 @@
 (send *counter* set-level! *current-level*)
 
 ; Grafikinställningar
-(define *width* 800)
-(define *height* 480)
+(define *game-canvas-width* 800)
+(define *game-canvas-height* 480)
+(define *game-menu-width* 100)
+(define *game-menu-height* 480)
 (define *victory* #f)
 
-(define GUI (make-gui *width* *height*))
+(define GUI (make-gui *game-canvas-width*
+                      *game-canvas-height*
+                      *game-menu-width*
+                      *game-menu-height*))
 
 (define *game-canvas* (new draw-object%
-                           [canvas (get-canvas GUI)]))
+                           [canvas (get-game-canvas GUI)]))
 
-(define *game-frame* (get-frame GUI))
+(define *game-frame* (get-game-frame GUI))
+
+(define *game-sidebar* (new draw-sidebar%
+                            [sidebar-canvas (get-sidebar-canvas GUI)]))
 
 ; Starta spelet
 (sleep/yield 0.01)
 (send *game-canvas* draw)
+(send *game-sidebar* draw)
 
 ; Spelloopen, ligger endast och väntar på knapptryckningar
 (define (handle-key-event key)
@@ -81,6 +92,7 @@
 
   ; Do shit 'n stuff here
   (send *game-canvas* draw)
+  (send *game-sidebar* draw)
   
   (if (send *current-board* level-complete?)
       (begin
@@ -88,3 +100,12 @@
         (send *counter* report-score *player-name*)
         (send win-dialog show #t))
       (void)))
+
+
+(define (handle-mouse-event event)
+  (cond ((eq? event 'leave)
+         (send *game-canvas* focus)
+         (display "Left"))
+        ((eq? event 'enter)
+         (send *game-menu* focus)
+         (display "Entered"))))

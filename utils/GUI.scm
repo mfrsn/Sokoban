@@ -7,17 +7,24 @@
 ; Beskrivning: Skapar de fönster och objekt som bygger upp vårt GUI.
 ;===================================================================
 
-(define (make-gui width height)
+(define (make-gui game-canvas-width
+                  game-canvas-height
+                  game-menu-width
+                  game-menu-height)
   ; Vår frame
   (define frame (new frame%
                      [label "Sokoban"]
-                     [min-width width]
-                     [min-height height]
+                     [min-width game-canvas-width]
+                     [min-height game-canvas-height]
                      [style '(no-resize-border)]))
   ; Paneler
   (define top-panel (new horizontal-panel%
                          [parent frame]
                          [stretchable-height #f]
+                         [alignment '(center top)]))
+  
+  (define mid-panel (new horizontal-panel%
+                         [parent frame]
                          [alignment '(center top)]))
   
   ; Knappar
@@ -78,21 +85,30 @@
   
   ; Definierar spelets canvas, förs samtidigt in i 'frame'
   (define game-canvas (new game-canvas%
-                           [parent frame]
-                           [min-width width]
-                           [min-height height]))
+                           [parent mid-panel]
+                           [min-width game-canvas-width]
+                           [min-height game-canvas-height]))
+  
+  ; Definierar spelets in-game meny.
+  (define game-sidebar (new sidebar-canvas%
+                            [parent mid-panel]
+                            [min-width game-menu-width]
+                            [min-height game-menu-height]))
   
   (send frame show #t)
   
   ; Returnerar game-canvas
-  (cons frame game-canvas))
+  (list frame game-canvas game-sidebar))
 
 ; Selektorer
-(define (get-frame GUI)
+(define (get-game-frame GUI)
   (car GUI))
 
-(define (get-canvas GUI)
-  (cdr GUI))
+(define (get-game-canvas GUI)
+  (cadr GUI))
+
+(define (get-sidebar-canvas GUI)
+  (caddr GUI))
 
 
 ; #### Vinstdialog #### Måste vara global för att kunna kalla på

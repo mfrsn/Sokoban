@@ -1,6 +1,6 @@
 ;=====================================================
 ; PRAM 2011
-; Senaste ändring: set-board! modifierad 2011-04-01
+; Senaste ändring: Power-up funktionalitet 2011-04-17
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -34,6 +34,12 @@
     (define/public (get-type)
       type)
     
+    (define/public (get-power-ups)
+      power-ups)
+    
+    (define/public (get-power-up-queue)
+      power-up-queue)
+    
     ; Setters
     (define/public (add-power-up! power-up)
       (set! power-ups (cons power-up power-ups)))
@@ -48,21 +54,29 @@
     (define/public (clear-power-up-queue!)
       (set! power-up-queue 'empty))
     
+    (define/public (clear-power-ups!)
+      (set! power-ups '()))
+    
     ; Funktioner
     
     ; Flyttar spelaren
     (define/public (move! direction)
       (send current-board move! this direction))
     
-    ; Använder spelarens power-up ; BROKEN!
+    ; Använder spelarens power-up
+    ; Om teleport läggs 'teleport som power-up-queue
+    ; (om ej upptagen)
     (define/public (use-power-up)
-      (let* ((power-up (car power-ups))
-             (type (send power-up get-type)))
-        (cond ((null? power-up-procedures) (display "No power-up")) ; Meddelande om ingen power-up här
-              ((eq? type 'teleport)
-               (set! power-up-queue (send power-up get-power-up-procedure))
-               (set! power-ups (cdr power-ups)))
-              (else (error "Unknown power-up type" type)))))
+      (if (null? power-ups)
+          (void)
+          (let* ((power-up (car power-ups))
+                 (sub-type (send power-up get-sub-type)))
+            (cond ((null? power-ups) (display "No power-up")) ; Meddelande om ingen power-up här
+                  ((and (eq? sub-type 'teleport)
+                        (eq? power-up-queue 'empty))
+                   (set! power-up-queue 'teleport)
+                   (set! power-ups (cdr power-ups)))
+                  (else (void))))))
               
               
     (super-new)))

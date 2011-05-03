@@ -90,13 +90,12 @@
   (send board set-start-position! position))
   
 ; Lägger till en power-up
-(define (add-powerup board position attribute)
-  (cond ((eq? attribute 'teleport)
+(define (add-powerup board position sub-type)
+  (cond ((eq? sub-type 'teleport)
          (send board set-square! position
                (create-floor 'floor
                              (new power-up%
                                   [current-position position]
-                                  [power-up-procedure (lambda ()
-                                                        (display "Teleportin mah block"))]
+                                  [power-up-procedure (void)]
                                   [sub-type 'teleport]))))
          (else (error "Invalid power-up attribute. Given:" attribute))))
