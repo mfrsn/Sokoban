@@ -158,19 +158,7 @@
               ((equal? position (car (car lst))) #t)
               (else (help (cdr lst)))))
       (help active-gifs))
-    
-    ; Avsluta alla animeringar i active-gifs
-    ; rensar även active-gifs
-    (define/private (stop-all-animations)
-      (define (help lst)
-        (if (null? lst)
-            (void)
-            (begin
-              (send (cdr (car lst)) stop-animation)
-              (help (cdr lst)))))
-      (help active-gifs)
-      (set! active-gifs '()))
-    
+        
     ; Uppdateringsfunktion
     (define/private (refresh)
       (define (iter-row row)
@@ -252,6 +240,18 @@
     ; Lås eller aktivera inputmöjligheter till canvas
     (define/public (enable bool)
       (send canvas enable bool))
+    
+    ; Avsluta alla animeringar i active-gifs
+    ; rensar även active-gifs
+    (define/public (stop-all-animations)
+      (define (help lst)
+        (if (null? lst)
+            (void)
+            (begin
+              (send (cdr (car lst)) stop-animation)
+              (help (cdr lst)))))
+      (help active-gifs)
+      (set! active-gifs '()))
     
     ; Sätt fokus till canvas
     (define/public (focus)
