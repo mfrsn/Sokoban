@@ -1,6 +1,6 @@
 ;================================================================
 ; PRAM 2011
-; Senaste ändring: quicksort implementerad 2011-04-08
+; Senaste ändring: fixat print-highscore 2011-04-29
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -70,12 +70,33 @@
     ;; --------------------------
     ;; Public
     ;; --------------------------
+    
+    ; lägger till en entry i scorelist
+    ; sorterar hela scorelist direkt efter, bättre sätt?
     (define/public (add-entry! player score)
       (set! scorelist (cons (list player score) scorelist))
       (sort-highscore!))
     
+    (define/public (get-score-list)
+      scorelist)
+    
+    ; skriver ut en formaterad lista
     (define/public (print-highscore number-of-entries)
-      (display "Level ")(display level)(newline))
+      (display "Level ")(display level)(newline)
+      
+      (define (help iter-list iter-num)
+        (cond ((null? iter-list) (void)) ; förhindra krasch
+              ((= iter-num number-of-entries) (void))
+              (else
+               (let ((entry (get-first-entry iter-list)))
+                 (display (get-score entry))(display " ")
+                 (display (get-player entry))(newline))
+               (help (get-rest-entries iter-list) (+ iter-num 1)))))
+      
+      (if (null? scorelist)
+          (begin
+            (display "Inga resultat.")(newline))
+          (help scorelist 0)))
 
     ))
 
