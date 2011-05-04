@@ -20,8 +20,8 @@
     (field 
      ; Funktionella variabler
      (refresh? #t)
-     (canvas-width (send canvas get-width))
-     (canvas-height (send canvas get-height))
+     (canvas-width *game-canvas-width*)
+     (canvas-height *game-canvas-height*)
      (map-width (send *current-board* get-width))
      (map-height (send *current-board* get-height))
      (block-size 36)
@@ -97,20 +97,11 @@
     
     ; Fyller hela canvas med background-colour
     (define/private (fill-canvas)
-      ;(send dc set-brush background-brush)
-      ;(send dc draw-rectangle 0 0 canvas-width canvas-height)
-      ;(send dc set-brush no-brush))
       (draw-png (make-position 0 0) background-png))
     
     ; Funktion som skapar ett rgb-objekt
     (define/private (make-colour r g b)
       (make-object color% r g b))
-    
-    ; Funktion som räknar ut sidan för ett block
-    ; detta beroende av nivåns utseende ENBART FÖR TESTSYFTE
-    (define/private (calculate-block-size)
-      (min (floor (/ canvas-width map-width))
-           (floor (/ canvas-height map-height))))
     
     ; Rita en bitmap
     (define/private (draw-masked-png position png mask)
@@ -256,6 +247,9 @@
     ; Sätt fokus till canvas
     (define/public (focus)
       (send canvas focus))
+    
+    (define/public (get-width)
+      canvas-width)
     
     ; Kör en animation som ligger "ovanpå" spelaren ytterligare args vid utbyggnad:
     ; 'gif-identifier (vilken animation?) bestämmer vilken gif-lista som skickas med

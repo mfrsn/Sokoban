@@ -24,7 +24,9 @@
 
 ; Återställer nuvarande nivån
 (define (reset-level!)
-  (load-level!))
+  (if *main-menu-active?*
+      (void)
+      (load-level!)))
 
 ; Laddar nästa nivå
 (define (next-level!)
@@ -38,14 +40,18 @@
 
 ; Startar om från första nivån
 (define (restart-game!)
-  (set! *current-level* 0)
-  (load-level!))
+  (if *main-menu-active?*
+      (void)
+      (begin
+        (set! *current-level* 0)
+        (load-level!))))
 
 (define (start-new-game!)
   (send *main-menu-animation-timer* stop)
   (set! *main-menu-active?* #f)
-  (send *game-canvas* draw)
-  (send *game-sidebar* draw))
+  (set! *current-level* 0)
+  (load-level!)
+  (send player-name-dialog show #t))
 
 (define (main-menu!)
   (send *main-menu-animation-timer* start 50)
@@ -53,3 +59,9 @@
   (send *game-canvas* stop-all-animations)
   (send *main-menu* draw)
   (send *game-sidebar* draw-main-menu))
+
+(define (quit!)
+  (send *main-menu-animation-timer* stop)
+  (set! *main-menu-active?* #f)
+  (send *game-canvas* stop-all-animations)
+  (send *game-frame* show #f))

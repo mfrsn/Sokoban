@@ -28,43 +28,33 @@
                          [alignment '(center top)]))
   
   ; Knappar
-  (define button-reset (new button%
+  (define reset-button (new button%
                             [label "Reset"]
                             [parent top-panel]
                             [callback (lambda (button event)
                                         (reset-level!)
                                         (send game-canvas focus))]))
   
-  (define button-restart (new button%
+  (define restart-button (new button%
                               [label "Restart"]
                               [parent top-panel]
                               [callback (lambda (button event)
                                           (restart-game!)
                                           (send game-canvas focus))]))
   
-  (define button-quit (new button%
+  (define main-menu-button (new button%
+                                [label "Main menu"]
+                                [parent top-panel]
+                                [callback (lambda (button event)
+                                            (main-menu!)
+                                            (send game-canvas focus))]))
+  
+  (define quit-button (new button%
                            [label "Quit"]
                            [parent top-panel]
                            [callback (lambda (button event)
-                                       (send frame show #f))]))
-  
-  (define button-set-name (new button%
-                               [label "Set name"]
-                               [parent top-panel]
-                               [callback (lambda (button event)
-                                           (send player-name-dialog show #t))]))
-  
-  ; #### Dialogruta för spelarens namn ####  
-  (define player-name-dialog (new dialog%
-                                  [label "Name"]))
-  
-  (define name-field (new text-field%
-                          [parent player-name-dialog]
-                          [label "Enter your name: "]))
-  
-  (define dialog-panel (new horizontal-panel%
-                            [parent player-name-dialog]
-                            [alignment '(center center)]))
+                                       (quit!))]))
+ 
   
   ; Knappar
   (define ok-button (new button%
@@ -94,8 +84,6 @@
                             [parent mid-panel]
                             [min-width game-menu-width]
                             [min-height game-menu-height]))
-  
-  (send frame show #t)
   
   ; Returnerar game-canvas
   (list frame game-canvas game-sidebar))
@@ -142,6 +130,18 @@
                          [callback (lambda (button event)
                                      (send win-dialog show #f)
                                      (send *game-frame* show #f))]))
+
+; #### Dialogruta för spelarens namn ####  
+(define player-name-dialog (new dialog%
+                                [label "Name"]))
+
+(define name-field (new text-field%
+                        [parent player-name-dialog]
+                        [label "Enter your name: "]))
+
+(define dialog-panel (new horizontal-panel%
+                          [parent player-name-dialog]
+                          [alignment '(center center)]))
 
 
   

@@ -16,10 +16,13 @@
     
     (field
      (dc (send canvas get-dc))
-     (canvas-width (send canvas get-width))
-     (canvas-height (send canvas get-height))
-     (button-width 100)
-     (button-height 20)
+     (canvas-width *game-canvas-width*)
+     (canvas-height *game-canvas-height*)
+     (total-width (+ canvas-width *game-sidebar-width*))
+     (menu-width 260)
+     (button-width 180)
+     (button-height 40)
+     (menu-position (calculate-menu-position))
     
      ; Palett
      (white (make-object color% 255 255 255))
@@ -31,29 +34,59 @@
      
      ; Bilder
      (background-png (make-object bitmap% "data/textures/background.png"))
+     (menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
+     (menu-background-mask-png (send menu-background-png get-loaded-mask))
      (new-game-png (make-object bitmap% "data/mainmenu/new-game.png"))
      (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png"))
+     (highscore-png (make-object bitmap% "data/mainmenu/highscore.png"))
+     (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png"))
      
      ; Knappar
      (new-game-button (new menu-button%
                            [label 'new-game]
-                           [position (make-position 200 200)]
+                           [position (calculate-button-position 0)]
                            [image new-game-png]
                            [mouseover-image new-game-mouseover-png]))
      
-     (button-list (list new-game-button)))
+     (highscore-button (new menu-button%
+                            [label 'highscore]
+                            [position (calculate-button-position 1)]
+                            [image highscore-png]
+                            [mouseover-image highscore-mouseover-png]))
+     
+     (button-list (list new-game-button highscore-button)))
+    
+    (define/private (calculate-button-position button-number)
+      (make-position (- (/ total-width 2) (/ button-width 2)) (+ 40 (* (+ button-height 10) button-number))))
+    
+    (define/private (calculate-menu-position)
+      (let ((top-button-position (calculate-button-position 0)))
+        (make-position (- (get-x-position top-button-position)
+                          (/ (- menu-width button-width) 2))
+                       (- (get-y-position top-button-position)
+                          20))))
      
     (define/private (fill-canvas)
       (send dc draw-bitmap background-png 0 0))
     
+    (define/private (draw-masked-png png mask position)
+      (send dc draw-bitmap png (get-x-position position) (get-y-position position) 'solid white mask))
+    
+    (define/private (draw-background)
+      (fill-canvas)
+      (draw-masked-png menu-background-png menu-background-mask-png menu-position))
+    
     (define/private (draw-buttons)
       (define (help button-list)
-        (let ((position (send (car button-list) get-position)))
-          (send dc draw-bitmap (send (car button-list) get-image) (get-x-position position) (get-y-position position))))
+        (if (null? button-list)
+            (void)
+            (let ((position (send (car button-list) get-position)))
+              (send dc draw-bitmap (send (car button-list) get-image) (get-x-position position) (get-y-position position))
+              (help (cdr button-list)))))
       (help button-list))        
     
     (define/private (refresh)
-      (fill-canvas)
+      (draw-background)
       (draw-buttons))
     
     (define/private (get-mouseover-button)
@@ -85,7 +118,8 @@
       (define (handle-button-press button)
         (let ((button-label (send button get-label)))
           (cond ((eq? button-label 'new-game)
-                 (start-new-game!))
+                 (start-new-game!)
+                 (send new-game-button set-mouseover! #f))
                 (else (void)))))
       
       (help button-list)
@@ -98,7 +132,10 @@
           (void)))
       
     (define/public (draw)
-      (refresh))
+      (send dc suspend-flush)
+      (refresh)
+      (send dc flush)
+      (send dc resume-flush))
     
     (super-new)))
                

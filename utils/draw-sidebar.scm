@@ -17,8 +17,8 @@
     (field
      (spacing 30)
      (dc (send sidebar-canvas get-dc))
-     (canvas-width (send sidebar-canvas get-width))
-     (canvas-height (send sidebar-canvas get-height))
+     (canvas-width *game-sidebar-width*)
+     (canvas-height *game-sidebar-height*)
      
      ; Palett
      (colour-black (make-object color% 0 0 0))
