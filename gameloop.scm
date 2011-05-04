@@ -20,6 +20,8 @@
 (load "utils/cgif.scm")
 (load "utils/cmenu.scm")
 (load "utils/draw-menu.scm")
+(load "utils/main-menu.scm")
+(load "utils/main-menu-button.scm")
 
 ; ADT:s
 (load "datatypes/board.scm")
@@ -28,6 +30,9 @@
 (load "datatypes/power-up.scm")
 (load "datatypes/block.scm")
 (load "datatypes/counter.scm")
+
+; Huvudmeny
+(define *main-menu-active?* #t)
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 3)
@@ -63,40 +68,59 @@
                       *game-menu-width*
                       *game-menu-height*))
 
+(define *game-frame* (get-game-frame GUI))
+
 (define *game-canvas* (new draw-object%
                            [canvas (get-game-canvas GUI)]))
-
-(define *game-frame* (get-game-frame GUI))
 
 (define *game-sidebar* (new draw-sidebar%
                             [sidebar-canvas (get-sidebar-canvas GUI)]))
 
-; Starta spelet
-(sleep/yield 0.01)
-(send *game-canvas* draw)
-(send *game-sidebar* draw)
+(define *main-menu* (new main-menu%
+                         [canvas (get-game-canvas GUI)]))
 
 ; Spelloopen, ligger endast och väntar på knapptryckningar
 (define (handle-key-event key)
-  (cond ((eq? key 'up)
-         (send *player* move! 'up))
-        ((eq? key 'down)
-         (send *player* move! 'down))
-        ((eq? key 'left)
-         (send *player* move! 'left))
-        ((eq? key 'right)
-         (send *player* move! 'right))
-        ((eq? key #\p)
-         (send *player* use-power-up))
-        (else (void)))
-
-  ; Do shit 'n stuff here
-  (send *game-canvas* draw)
-  (send *game-sidebar* draw)
-  
-  (if (send *current-board* level-complete?)
+  (if *main-menu-active?*
+      (void)
       (begin
-        (play-sound "data/sounds/win-sound.wav" #t)
-        (send *counter* report-score *player-name*)
-        (send win-dialog show #t))
+        (cond ((eq? key 'up)
+              (send *player* move! 'up))
+             ((eq? key 'down)
+              (send *player* move! 'down))
+             ((eq? key 'left)
+              (send *player* move! 'left))
+             ((eq? key 'right)
+              (send *player* move! 'right))
+             ((eq? key #\p)
+              (send *player* use-power-up))
+             (else (void)))
+       
+       ; Do shit 'n stuff here
+       (send *game-canvas* draw)
+       (send *game-sidebar* draw)
+       
+       (if (send *current-board* level-complete?)
+           (begin
+             (play-sound "data/sounds/win-sound.wav" #t)
+             (send *counter* report-score *player-name*)
+             (send win-dialog show #t))
+           (void)))))
+
+(define (handle-mouse-event event)
+  (if *main-menu-active?*
+      (send *main-menu* handle-mouse-event (send event get-x) (send event get-y) (send event get-event-type))
       (void)))
+
+(define (draw-main-menu)
+  (send *main-menu* draw)
+  (send *game-sidebar* draw-main-menu))
+
+(define *main-menu-animation-timer* (new timer%
+                                         [interval 100]
+                                         [notify-callback draw-main-menu]))
+
+; Starta spelet
+(sleep/yield 0.01)
+(send *main-menu* draw)
+(send *game-sidebar* draw-main-menu)

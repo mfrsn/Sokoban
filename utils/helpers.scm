@@ -40,3 +40,9 @@
 (define (restart-game!)
   (set! *current-level* 0)
   (load-level!))
+
+(define (start-new-game!)
+  (send *main-menu-animation-timer* stop)
+  (set! *main-menu-active?* #f)
+  (send *game-canvas* draw)
+  (send *game-sidebar* draw))

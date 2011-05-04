@@ -38,4 +38,7 @@
       ;(display "on-char called")
       (handle-key-event (send event get-key-code)))
     
+    (define/override (on-event event)
+      (handle-mouse-event event))
+    
     (super-new)))

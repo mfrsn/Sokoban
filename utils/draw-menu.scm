@@ -27,10 +27,6 @@
      (blue-brush (make-object brush% "BLUE" 'solid))
      
      ; Bildfiler
-     (power-up-text (make-object bitmap% "data/text/power-ups.png" 'png/mask))
-     (power-up-text-mask (send power-up-text get-loaded-mask))
-     (steps-text (make-object bitmap% "data/text/steps.png" 'png/mask))
-     (steps-text-mask (send steps-text get-loaded-mask))
      (background-png (make-object bitmap% "data/textures/background.png"))
      (teleport-icon-png (make-object bitmap% "data/sidebar/teleport-icon.png" 'png/mask))
      (teleport-icon-mask (send teleport-icon-png get-loaded-mask))
@@ -78,8 +74,13 @@
       (draw-text)
       (draw-power-ups))
     
+    ; Ritar upp sidobaren
     (define/public (draw)
       (refresh))
+    
+    ; Ritar då huvudmenyn är igång
+    (define/public (draw-main-menu)
+      (fill-canvas))
     
     (define/public (get-font)
       (send dc get-font))

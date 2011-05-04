@@ -12,8 +12,8 @@
 (define sidebar-canvas%
   (class canvas%
     
-    (define/override (on-event event)
-      (handle-mouse-event event))
+    ;(define/override (on-event event)
+      ;(handle-mouse-event event))
     
     (super-new)))
     
