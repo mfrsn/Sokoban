@@ -37,9 +37,9 @@
 ; Ladda in nivåfilerna
 (define *number-of-maps* 3)
 (define *game-data* (make-vector *number-of-maps*))
-(vector-set! *game-data* 0 (load-level-file "levels/level-2"))
+(vector-set! *game-data* 0 (load-level-file "levels/level-1"))
 (vector-set! *game-data* 1 (load-level-file "levels/level-3"))
-(vector-set! *game-data* 2 (load-level-file "levels/level-1"))
+(vector-set! *game-data* 2 (load-level-file "levels/level-2"))
 
 ; Skapa spelaren
 (define *player* (new player%
