@@ -54,24 +54,6 @@
                            [parent top-panel]
                            [callback (lambda (button event)
                                        (quit!))]))
- 
-  
-  ; Knappar
-  (define ok-button (new button%
-                         [label "Ok"]
-                         [parent dialog-panel]
-                         [enabled #t]
-                         [callback (lambda (button event)
-                                     (set! *player-name* (send name-field get-value))
-                                     (send player-name-dialog show #f)
-                                     (send game-canvas focus))]))
-  
-  (define cancel-button (new button%
-                             [label "Cancel"]
-                             [parent dialog-panel]
-                             [callback (lambda (button event)
-                                         (send player-name-dialog show #f)
-                                         (send game-canvas focus))]))
   
   ; Definierar spelets canvas, förs samtidigt in i 'frame'
   (define game-canvas (new game-canvas%
@@ -142,6 +124,17 @@
 (define dialog-panel (new horizontal-panel%
                           [parent player-name-dialog]
                           [alignment '(center center)]))
+
+  ; Knappar
+  (define ok-button (new button%
+                         [label "Ok"]
+                         [parent dialog-panel]
+                         [enabled #t]
+                         [min-width 60]
+                         [callback (lambda (button event)
+                                     (set! *player-name* (send name-field get-value))
+                                     (send player-name-dialog show #f)
+                                     (send *game-canvas* focus))]))
 
 
   

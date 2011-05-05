@@ -36,10 +36,10 @@
      (background-png (make-object bitmap% "data/textures/background.png"))
      (menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
      (menu-background-mask-png (send menu-background-png get-loaded-mask))
-     (new-game-png (make-object bitmap% "data/mainmenu/new-game.png"))
-     (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png"))
-     (highscore-png (make-object bitmap% "data/mainmenu/highscore.png"))
-     (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png"))
+     (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
+     (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png" 'png/mask))
+     (highscore-png (make-object bitmap% "data/mainmenu/highscore.png" 'png/mask))
+     (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png" 'png/mask))
      
      ; Knappar
      (new-game-button (new menu-button%
@@ -57,14 +57,14 @@
      (button-list (list new-game-button highscore-button)))
     
     (define/private (calculate-button-position button-number)
-      (make-position (- (/ total-width 2) (/ button-width 2)) (+ 40 (* (+ button-height 10) button-number))))
+      (make-position (- (/ total-width 2) (/ button-width 2)) (+ 170 (* (+ button-height 10) button-number))))
     
     (define/private (calculate-menu-position)
       (let ((top-button-position (calculate-button-position 0)))
         (make-position (- (get-x-position top-button-position)
                           (/ (- menu-width button-width) 2))
                        (- (get-y-position top-button-position)
-                          20))))
+                          47))))
      
     (define/private (fill-canvas)
       (send dc draw-bitmap background-png 0 0))
@@ -80,8 +80,8 @@
       (define (help button-list)
         (if (null? button-list)
             (void)
-            (let ((position (send (car button-list) get-position)))
-              (send dc draw-bitmap (send (car button-list) get-image) (get-x-position position) (get-y-position position))
+            (let ((image (send (car button-list) get-image)))
+              (draw-masked-png image (send image get-loaded-mask) (send (car button-list) get-position))
               (help (cdr button-list)))))
       (help button-list))        
     
@@ -132,11 +132,11 @@
           (void)))
       
     (define/public (draw)
-      (send dc suspend-flush)
+      ;(send dc suspend-flush)
       (refresh)
-      (send dc flush)
-      (send dc resume-flush))
-    
+      ;(send dc flush)
+      ;(send dc resume-flush))
+      )
     (super-new)))
                
                
