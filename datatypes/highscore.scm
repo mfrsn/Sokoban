@@ -71,14 +71,28 @@
     ;; Public
     ;; --------------------------
     
+    ; tömmer scorelistan
+    (define/public (clear-highscore!)
+      (set! scorelist '()))
+    
     ; lägger till en entry i scorelist
     ; sorterar hela scorelist direkt efter, bättre sätt?
     (define/public (add-entry! player score)
       (set! scorelist (cons (list player score) scorelist))
       (sort-highscore!))
     
-    (define/public (get-score-list)
+    ; hämtar hela highscorelistan
+    (define/public (get-scorelist-full)
       scorelist)
+    
+    ; hämtar ut de number-of-entries första poängen
+    ; TODO: slippa reversera listan?
+    (define/public (get-scorelist number-of-entries)
+      (define (help iter-list res-list iter-num)
+        (cond ((null? iter-list) (reverse res-list))
+              ((= iter-num number-of-entries) (reverse res-list))
+              (else (help (cdr iter-list) (cons (car iter-list) res-list) (+ iter-num 1)))))
+      (help scorelist '() 0))
     
     ; skriver ut en formaterad lista
     (define/public (print-highscore number-of-entries)
@@ -103,11 +117,19 @@
 ;; --------------------------
 ;; Testfall för highscore ADT
 ;; --------------------------
-(define highscore (new highscore%
-                       [level 1]))
-
-(send highscore add-entry! "mattias" 44)
-(send highscore add-entry! "marcus" 42)
-(send highscore add-entry! "björn" 51)
-(send highscore add-entry! "märta" 47)
-(send highscore add-entry! "per" 39)
+;(define highscore (new highscore%
+;                       [level 1]))
+;
+;(send highscore add-entry! "mattias" 44)
+;(send highscore add-entry! "marcus" 42)
+;(send highscore add-entry! "björn" 51)
+;(send highscore add-entry! "märta" 47)
+;(send highscore add-entry! "per" 39)
+;
+;(send highscore clear-highscore!)
+;(send highscore print-highscore 5)
+;
+;(send highscore add-entry! "märta" 47)
+;(send highscore add-entry! "per" 39)
+;
+;(send highscore print-highscore 5)
