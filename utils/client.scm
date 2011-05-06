@@ -44,9 +44,6 @@
     (define/public (test-connection)
       (connect))
     
-    (define/public (add-highscore! level)
-      (connect 'add-highscore level))
-    
     (define/public (clear-highscore! level)
       (connect 'clear-highscore level))
     

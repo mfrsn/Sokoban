@@ -44,16 +44,22 @@
             'error-downloading-highscore
             (send hs-obj get-scorelist (cadr arg-lst)))))
     
-    ; NOTE: saknar felhanting, två highscore's med samma level-number ger
-    ; odefinierat beteende.
-    (define/private (add-highscore! level-number)
-      (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
+    (define/private (print-connection-info port)
+      (define-values (server-addr client-addr) (tcp-addresses port))
+      (display "Connection accepted from ")
+      (display client-addr)
+      (newline))
     
     ;; --------------------------
     ;; Public
     ;; --------------------------
     (define/public (set-port! new-port)
       (set! port-number new-port))
+    
+    ; NOTE: saknar felhanting, två highscore's med samma level-number ger
+    ; odefinierat beteende.
+    (define/public (add-highscore! level-number)
+      (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
     
     (define/public (start)
       (define listener (tcp-listen port-number))
@@ -62,6 +68,7 @@
       (newline)
       (define (server-loop)
         (define-values (client->server server->client) (tcp-accept listener))
+        (print-connection-info client->server)
         (let ((arg-lst (read client->server)))
           (close-input-port client->server)
           (cond ((null? arg-lst)
@@ -69,15 +76,6 @@
                  (write 'sokoban-highscore-server server->client)
                  (flush-output server->client)
                  (close-output-port server->client)
-                 (server-loop))
-                
-                ; lägg till en highscorelista
-                ; arg-lst: 'add-highscore level-number
-                ((eq? (car arg-lst) 'add-highscore)
-                 (add-highscore! (cadr arg-lst))
-                 (write 'highscore-added server->client)
-                 (flush-output server->client)
-                 (close-output-port server-client)
                  (server-loop))
                 
                 ; töm en highscorelista
@@ -100,6 +98,7 @@
                        (write 'error-adding-score server->client)
                        (flush-output server->client)))
                  (close-output-port server->client)
+                 (display "Score added.")(newline)
                  (server-loop))
                 
                 ; hämta highscore
@@ -108,6 +107,7 @@
                  (write (get-highscore (cdr arg-lst)) server->client)
                  (flush-output server->client)
                  (close-output-port server->client)
+                 (display "Highscore sent.")(newline)
                  (server-loop))
                 
                 (else ; okänt argument
@@ -131,9 +131,9 @@
 (define highscore-server (new server% [port-number *port*]))
 
 ; skapa highscore-listor. TODO: (automatisk numrering?)
+(send highscore-server add-highscore! 0)
 (send highscore-server add-highscore! 1)
 (send highscore-server add-highscore! 2)
-(send highscore-server add-highscore! 3)
 
 ; server hanterare, kan endast stänga av servern atm
 (define stop-server (send highscore-server start))
