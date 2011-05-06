@@ -11,6 +11,8 @@
 
 (require racket/tcp)
 
+(load "../datatypes/highscore.scm")
+
 (define server%
   (class object%
     (super-new)
@@ -27,6 +29,7 @@
             (cdr hs-obj))))
     
     ; TODO: ordentlig felhantering
+    ; arg-lst: (level player-name score)
     (define (add-score! arg-lst)
       (cond ((not (= (length arg-lst) 3)) #f)
             (else
@@ -34,21 +37,21 @@
              #t)))
     
     ; TODO: ordentlig felhantering
+    ; arg-lst: (level number-of-entries)
     (define/private (get-highscore arg-lst)
       (let ((hs-obj (get-highscore-object (car arg-lst))))
         (if (not hs-obj)
             'error-downloading-highscore
             (send hs-obj get-scorelist (cadr arg-lst)))))
     
+    ; NOTE: saknar felhanting, två highscore's med samma level-number ger
+    ; odefinierat beteende.
+    (define/private (add-highscore! level-number)
+      (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
+    
     ;; --------------------------
     ;; Public
     ;; --------------------------
-    
-    ; NOTE: saknar felhanting, två highscore's med samma level-number ger
-    ; odefinierat beteende.
-    (define/public (add-highscore! level-number)
-      (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
-    
     (define/public (set-port! new-port)
       (set! port-number new-port))
     
@@ -62,11 +65,23 @@
         (let ((arg-lst (read client->server)))
           (close-input-port client->server)
           (cond ((null? arg-lst)
+                 ; tom argument-lista för att testa anslutning
                  (write 'sokoban-highscore-server server->client)
                  (flush-output server->client)
                  (close-output-port server->client)
                  (server-loop))
                 
+                ; lägg till en highscorelista
+                ; arg-lst: 'add-highscore level-number
+                ((eq? (car arg-lst) 'add-highscore)
+                 (add-highscore! (cadr arg-lst))
+                 (write 'highscore-added server->client)
+                 (flush-output server->client)
+                 (close-output-port server-client)
+                 (server-loop))
+                
+                ; töm en highscorelista
+                ; arg-lst: 'clear-highscore level-number
                 ((eq? (car arg-lst) 'clear-highscore)
                  (send (get-highscore-object (cadr arg-lst)) clear-highscore!)
                  (write 'highscore-cleared server->client)
@@ -74,7 +89,9 @@
                  (close-output-port server->client)
                  (server-loop))
                 
-                ((eq? (car arg-lst) 'add-score) ; add score
+                ; rapportera in poäng
+                ; arg-lst: 'add-score level player-name score
+                ((eq? (car arg-lst) 'add-score)
                  (if (add-score! (cdr arg-lst))
                      (begin
                        (write 'score-added server->client)
@@ -85,7 +102,9 @@
                  (close-output-port server->client)
                  (server-loop))
                 
-                ((eq? (car arg-lst) 'get-highscore) ; returnerar highscore
+                ; hämta highscore
+                ; arg-lst 'get-highscore level number-of-entries
+                ((eq? (car arg-lst) 'get-highscore)
                  (write (get-highscore (cdr arg-lst)) server->client)
                  (flush-output server->client)
                  (close-output-port server->client)
@@ -105,14 +124,16 @@
     ))
 
 ;; --------------------------
-;; Testfall för server
+;; Server instantiering
 ;; --------------------------
-;(define test-server (new server% [port-number *port*]))
-;
+(define *port* 23409)
+
+(define highscore-server (new server% [port-number *port*]))
+
 ; skapa highscore-listor. TODO: (automatisk numrering?)
-;(send test-server add-highscore! 1)
-;(send test-server add-highscore! 2)
-;(send test-server add-highscore! 3)
-;
+(send highscore-server add-highscore! 1)
+(send highscore-server add-highscore! 2)
+(send highscore-server add-highscore! 3)
+
 ; server hanterare, kan endast stänga av servern atm
-;(define stop-server (send test-server start))
+(define stop-server (send highscore-server start))
