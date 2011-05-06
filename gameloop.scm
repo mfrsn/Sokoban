@@ -8,6 +8,15 @@
 ; Beskrivning: Definierar vår gameloop, uppstart + globala variabler
 ;====================================================================
 
+; ADT:s
+(load "datatypes/board.scm")
+(load "datatypes/floor.scm")
+(load "datatypes/player.scm")
+(load "datatypes/power-up.scm")
+(load "datatypes/block.scm")
+(load "datatypes/counter.scm")
+(load "datatypes/highscore.scm")
+
 ; Utils
 (load "utils/position.scm")
 (load "utils/carray.scm")
@@ -21,17 +30,15 @@
 (load "utils/draw-sidebar.scm")
 (load "utils/main-menu.scm")
 (load "utils/main-menu-button.scm")
-
-; ADT:s
-(load "datatypes/board.scm")
-(load "datatypes/floor.scm")
-(load "datatypes/player.scm")
-(load "datatypes/power-up.scm")
-(load "datatypes/block.scm")
-(load "datatypes/counter.scm")
+(load "utils/server.scm")
+(load "utils/client.scm")
 
 ; Huvudmeny
 (define *main-menu-active?* #t)
+
+; Anslutning till servern
+(define *port* 23409)
+(define *host* "localhost")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 3)
@@ -39,6 +46,19 @@
 (vector-set! *game-data* 0 (load-level-file "levels/level-2"))
 (vector-set! *game-data* 1 (load-level-file "levels/level-3"))
 (vector-set! *game-data* 2 (load-level-file "levels/level-2"))
+
+; Starta highscoreserver
+(define *highscore-server* (new server% [port-number *port*]))
+(define stop-server (send *highscore-server* start))
+(send *highscore-server* add-highscore! 0)
+(send *highscore-server* add-highscore! 1)
+(send *highscore-server* add-highscore! 2)
+
+; Starta klient till highscoreservern
+(define *highscore-client* (new client%
+                                [port-number *port*]
+                                [host-address *host*]))
+
 
 ; Skapa spelaren
 (define *player* (new player%
@@ -105,6 +125,7 @@
            (begin
              (play-sound "data/sounds/win-sound.wav" #t)
              (send *counter* report-score *player-name*)
+             (send *highscore-client* upload-score *current-level* *player-name* (send *counter* get-count))
              (send win-dialog show #t))
            (void)))))
 
@@ -125,7 +146,6 @@
 (send *main-menu-animation-timer* stop)
 
 ; Starta spelet
-(sleep/yield 0.01)
 
 (define (run)
   (send *game-frame* show #t)

@@ -10,9 +10,6 @@
 ;================================================================
 
 (require racket/tcp)
-(load "../datatypes/highscore.scm")
-
-(define *port* 23409) ; port för anslutning
 
 (define server%
   (class object%
@@ -110,12 +107,12 @@
 ;; --------------------------
 ;; Testfall för server
 ;; --------------------------
-(define test-server (new server% [port-number *port*]))
-
+;(define test-server (new server% [port-number *port*]))
+;
 ; skapa highscore-listor. TODO: (automatisk numrering?)
-(send test-server add-highscore! 1)
-(send test-server add-highscore! 2)
-(send test-server add-highscore! 3)
-
+;(send test-server add-highscore! 1)
+;(send test-server add-highscore! 2)
+;(send test-server add-highscore! 3)
+;
 ; server hanterare, kan endast stänga av servern atm
-(define stop-server (send test-server start))
+;(define stop-server (send test-server start))

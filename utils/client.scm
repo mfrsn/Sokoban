@@ -12,11 +12,6 @@
 
 (require racket/tcp)
 
-(load "../datatypes/highscore.scm")
-
-(define *port* 23409)
-(define *host* "localhost")
-
 (define client%
   (class object%
     (super-new)
