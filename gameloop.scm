@@ -30,7 +30,6 @@
 (load "utils/draw-sidebar.scm")
 (load "utils/main-menu.scm")
 (load "utils/main-menu-button.scm")
-(load "utils/server.scm")
 (load "utils/client.scm")
 
 ; Huvudmeny
@@ -38,7 +37,7 @@
 
 ; Anslutning till servern
 (define *port* 23409)
-(define *host* "localhost")
+(define *host* "130.236.70.220")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 3)
@@ -47,18 +46,10 @@
 (vector-set! *game-data* 1 (load-level-file "levels/level-3"))
 (vector-set! *game-data* 2 (load-level-file "levels/level-2"))
 
-; Starta highscoreserver
-(define *highscore-server* (new server% [port-number *port*]))
-(define stop-server (send *highscore-server* start))
-(send *highscore-server* add-highscore! 0)
-(send *highscore-server* add-highscore! 1)
-(send *highscore-server* add-highscore! 2)
-
 ; Starta klient till highscoreservern
 (define *highscore-client* (new client%
                                 [port-number *port*]
                                 [host-address *host*]))
-
 
 ; Skapa spelaren
 (define *player* (new player%
@@ -98,7 +89,8 @@
                             [sidebar-canvas (get-sidebar-canvas GUI)]))
 
 (define *main-menu* (new main-menu%
-                         [canvas (get-game-canvas GUI)]))
+                         [canvas (get-game-canvas GUI)]
+                         [highscore-client *highscore-client*]))
 
 ; Spelloopen, ligger endast och väntar på knapptryckningar
 (define (handle-key-event key)

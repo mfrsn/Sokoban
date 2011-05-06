@@ -56,6 +56,7 @@
 (define (main-menu!)
   (send *main-menu-animation-timer* start 50)
   (set! *main-menu-active?* #t)
+  (send *main-menu* set-on-menu! #t)
   (send *game-canvas* stop-all-animations)
   (send *main-menu* draw)
   (send *game-sidebar* draw-main-menu))

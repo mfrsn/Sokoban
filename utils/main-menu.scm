@@ -12,18 +12,32 @@
 (define main-menu%
   (class object%
     
-    (init-field canvas)
+    (init-field canvas
+                highscore-client
+                (menu-width 260)
+                (button-width 180)
+                (button-height 40)
+                (highscore-level 0)
+                (highscore-entry-spacing 20)
+                (highscore-score-offset 100)
+                (highscore-name-offset 20)
+                (highscore-x-offset 20)
+                (highscore-y-offset 20))
     
     (field
      (dc (send canvas get-dc))
      (canvas-width *game-canvas-width*)
      (canvas-height *game-canvas-height*)
      (total-width (+ canvas-width *game-sidebar-width*))
-     (menu-width 260)
-     (button-width 180)
-     (button-height 40)
      (menu-position (calculate-menu-position))
-    
+     (highscore-menu-position menu-position)
+     (number-of-highscore-entrys 5)
+     (on-main-menu? #t)
+     (highscore-list (send highscore-client
+                           download-highscore
+                           highscore-level
+                           number-of-highscore-entrys))
+     
      ; Palett
      (white (make-object color% 255 255 255))
      (red (make-object color% 255 0 0))
@@ -54,7 +68,8 @@
                             [image highscore-png]
                             [mouseover-image highscore-mouseover-png]))
      
-     (button-list (list new-game-button highscore-button)))
+     (button-list-main-menu (list new-game-button highscore-button))
+     (button-list-highscore '()))
     
     (define/private (calculate-button-position button-number)
       (make-position (- (/ total-width 2) (/ button-width 2)) (+ 170 (* (+ button-height 10) button-number))))
@@ -72,11 +87,11 @@
     (define/private (draw-masked-png png mask position)
       (send dc draw-bitmap png (get-x-position position) (get-y-position position) 'solid white mask))
     
-    (define/private (draw-background)
+    (define/private (draw-background-main-menu)
       (fill-canvas)
       (draw-masked-png menu-background-png menu-background-mask-png menu-position))
     
-    (define/private (draw-buttons)
+    (define/private (draw-buttons button-list)
       (define (help button-list)
         (if (null? button-list)
             (void)
@@ -86,8 +101,64 @@
       (help button-list))        
     
     (define/private (refresh)
-      (draw-background)
-      (draw-buttons))
+      (if on-main-menu?
+          (draw-main-menu)
+          (draw-highscore)))
+    
+    (define/private (draw-main-menu)
+      (draw-background-main-menu)
+      (draw-buttons button-list-main-menu))
+    
+    (define/private (draw-highscore)
+      (draw-background-main-menu)
+      (draw-buttons button-list-highscore)
+      (draw-highscore-table))
+    
+    (define/private (draw-highscore-table)
+      (let ((entry-index 0))
+        
+        (define (help highscore-list)
+          (if (null? highscore-list)
+              (void)
+              (begin
+                (print-highscore-entry (car highscore-list) entry-index)
+                (set! entry-index (+ entry-index 1))
+                (help (cdr highscore-list)))))
+        
+        (define (calculate-entry-draw-position entry-type entry-index)
+          (cond ((eq? entry-type 'index)
+                 (make-position (+ (get-x-position highscore-menu-position)
+                                   highscore-x-offset)
+                                (+ (get-y-position highscore-menu-position)
+                                   highscore-y-offset
+                                   (* highscore-entry-spacing entry-index))))
+                ((eq? entry-type 'name)
+                 (make-position (+ (get-x-position highscore-menu-position)
+                                   highscore-x-offset
+                                   highscore-name-offset)
+                                (+ (get-y-position highscore-menu-position)
+                                   highscore-y-offset
+                                   (* highscore-entry-spacing entry-index))))
+                ((eq? entry-type 'score)
+                 (make-position (+ (get-x-position highscore-menu-position)
+                                   highscore-x-offset
+                                   highscore-score-offset)
+                                 (+ (get-y-position highscore-menu-position)
+                                   highscore-y-offset
+                                   (* highscore-entry-spacing entry-index))))
+                (else (void))))
+        
+        (define (print-highscore-entry entry entry-index)
+          (let ((index-position (calculate-entry-draw-position 'index entry-index))
+                (name-position (calculate-entry-draw-position 'name entry-index))
+                (score-position (calculate-entry-draw-position 'score entry-index)))
+            
+            (send dc draw-text (number->string (+ entry-index 1)) (get-x-position index-position) (get-y-position index-position))
+            (send dc draw-text (car entry) (get-x-position name-position) (get-y-position name-position))
+            (send dc draw-text (number->string (cadr entry)) (get-x-position score-position) (get-y-position score-position))))
+        
+        (help highscore-list)))
+            
     
     (define/private (get-mouseover-button)
       (define (help button-list)
@@ -95,7 +166,7 @@
               ((send (car button-list) get-mouseover)
                (car button-list))
               (else (help (cdr button-list)))))
-      (help button-list))
+      (help button-list-main-menu))
     
     (define/public (handle-mouse-event mouse-x mouse-y event-type)
       ; Hantera mouseover
@@ -120,9 +191,13 @@
           (cond ((eq? button-label 'new-game)
                  (start-new-game!)
                  (send new-game-button set-mouseover! #f))
+                ((eq? button-label 'highscore)
+                 (set! on-main-menu? #f)
+                 (send new-game-button set-mouseover! #f))
                 (else (void)))))
       
-      (help button-list)
+      (help button-list-main-menu)
+      ;andra button-lists
       
       (if (eq? event-type 'left-down)
           (let ((mouseover-button (get-mouseover-button)))
@@ -137,6 +212,10 @@
       ;(send dc flush)
       ;(send dc resume-flush))
       )
+    
+    (define/public (set-on-menu! bool)
+      (set! on-main-menu? bool))
+    
     (super-new)))
                
                
