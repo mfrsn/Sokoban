@@ -14,16 +14,16 @@
     
     (init-field canvas
                 highscore-client
-                (menu-width 260)
-                (button-width 180)
-                (button-height 40)
                 (highscore-level 0)
                 (current-highscore-level 0)
                 (highscore-entry-spacing 20)
                 (highscore-score-offset 170)
                 (highscore-name-offset 75)
                 (highscore-x-offset 20)
-                (highscore-y-offset 20))
+                (highscore-y-offset 20)
+                (menu-width 260)
+                (button-width 180)
+                (button-height 40))
     
     (field
      (dc (send canvas get-dc))
@@ -34,11 +34,8 @@
      (highscore-menu-position menu-position)
      (number-of-highscore-entrys 5)
      (on-main-menu? #t)
-     (highscore-list (send highscore-client
-                           download-highscore
-                           highscore-level
-                           number-of-highscore-entrys))
-     
+     (highscore-list '())
+         
      ; Palett
      (white (make-object color% 255 255 255))
      (red (make-object color% 255 0 0))
