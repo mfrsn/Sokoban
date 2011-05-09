@@ -18,9 +18,10 @@
                 (button-width 180)
                 (button-height 40)
                 (highscore-level 0)
+                (current-highscore-level 0)
                 (highscore-entry-spacing 20)
-                (highscore-score-offset 100)
-                (highscore-name-offset 20)
+                (highscore-score-offset 170)
+                (highscore-name-offset 75)
                 (highscore-x-offset 20)
                 (highscore-y-offset 20))
     
@@ -41,10 +42,12 @@
      ; Palett
      (white (make-object color% 255 255 255))
      (red (make-object color% 255 0 0))
+     (colour-black (make-object color% 0 0 0))
      
      ; Verktyg
      (white-brush (make-object brush% white 'solid))
      (red-brush (make-object brush% red 'solid))
+     (font (send the-font-list find-or-create-font 16 "Britannic Bold" 'default 'normal 'normal))
      
      ; Bilder
      (background-png (make-object bitmap% "data/textures/background.png"))
@@ -70,6 +73,9 @@
      
      (button-list-main-menu (list new-game-button highscore-button))
      (button-list-highscore '()))
+
+    (send dc set-text-foreground colour-black)
+    (send dc set-font font)
     
     (define/private (calculate-button-position button-number)
       (make-position (- (/ total-width 2) (/ button-width 2)) (+ 170 (* (+ button-height 10) button-number))))
@@ -113,6 +119,16 @@
       (draw-background-main-menu)
       (draw-buttons button-list-highscore)
       (draw-highscore-table))
+     
+    (define/private (update-highscore-list)
+      (let ((server-highscore-list (send highscore-client
+                                        download-highscore
+                                        highscore-level
+                                        number-of-highscore-entrys)))
+      (if (or (not (= highscore-level current-highscore-level))
+              (not (equal? highscore-list server-highscore-list)))
+          (set! highscore-list server-highscore-list)
+          (void))))
     
     (define/private (draw-highscore-table)
       (let ((entry-index 0))
@@ -130,21 +146,21 @@
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset)
                                 (+ (get-y-position highscore-menu-position)
-                                   highscore-y-offset
+                                   (* highscore-y-offset 2)
                                    (* highscore-entry-spacing entry-index))))
                 ((eq? entry-type 'name)
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset
                                    highscore-name-offset)
                                 (+ (get-y-position highscore-menu-position)
-                                   highscore-y-offset
+                                   (* highscore-y-offset 2)
                                    (* highscore-entry-spacing entry-index))))
                 ((eq? entry-type 'score)
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset
                                    highscore-score-offset)
                                  (+ (get-y-position highscore-menu-position)
-                                   highscore-y-offset
+                                   (* highscore-y-offset 2)
                                    (* highscore-entry-spacing entry-index))))
                 (else (void))))
         
@@ -157,6 +173,13 @@
             (send dc draw-text (car entry) (get-x-position name-position) (get-y-position name-position))
             (send dc draw-text (number->string (cadr entry)) (get-x-position score-position) (get-y-position score-position))))
         
+        (define (draw-titles)
+          (let ((y-position (+ (get-y-position highscore-menu-position) highscore-y-offset)))
+            (send dc draw-text "Rank:" (+ (get-x-position highscore-menu-position) highscore-x-offset) y-position)
+            (send dc draw-text "Name:" (get-x-position (calculate-entry-draw-position 'name 0)) y-position)
+            (send dc draw-text "Score:" (get-x-position (calculate-entry-draw-position 'score 0)) y-position)))
+        
+        (draw-titles)
         (help highscore-list)))
             
     
@@ -193,6 +216,7 @@
                  (send new-game-button set-mouseover! #f))
                 ((eq? button-label 'highscore)
                  (set! on-main-menu? #f)
+                 (update-highscore-list)
                  (send new-game-button set-mouseover! #f))
                 (else (void)))))
       
@@ -216,7 +240,4 @@
     (define/public (set-on-menu! bool)
       (set! on-main-menu? bool))
     
-    (super-new)))
-               
-               
-      
+    (super-new)))      
