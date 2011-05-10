@@ -136,7 +136,7 @@
 
 ; Huvudmenyns animationstimer
 (define *main-menu-animation-timer* (new timer%
-                                         [interval 150]
+                                         [interval 500]
                                          [notify-callback draw-main-menu]))
 (send *main-menu-animation-timer* stop)
 
