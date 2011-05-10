@@ -36,8 +36,8 @@
 (define *main-menu-active?* #t)
 
 ; Anslutning till servern
-(define *port* 23407)
-(define *host* "localhost")
+(define *port* 23408)
+(define *host* "130.236.71.123")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 6)
