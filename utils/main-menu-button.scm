@@ -12,6 +12,8 @@
     
     (init-field label
                 position
+                width
+                height
                 image
                 mouseover-image)
     
@@ -33,5 +35,11 @@
     
     (define/public (get-position)
       position)
+    
+    (define/public (get-width)
+      width)
+    
+    (define/public (get-height)
+      height)
     
     (super-new)))

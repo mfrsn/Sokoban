@@ -20,18 +20,32 @@
                 (highscore-score-offset 170)
                 (highscore-name-offset 75)
                 (highscore-x-offset 20)
-                (highscore-y-offset 20)
-                (menu-width 260)
-                (button-width 180)
-                (button-height 40))
+                (highscore-y-offset 20))
     
     (field
+     
+     ; Bilder
+     (background-png (make-object bitmap% "data/textures/background.png"))
+     (menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
+     (menu-background-mask-png (send menu-background-png get-loaded-mask))
+     (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
+     (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png" 'png/mask))
+     (highscore-png (make-object bitmap% "data/mainmenu/highscore.png" 'png/mask))
+     (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png" 'png/mask))
+     (highscore-next-level-png (make-object bitmap% "data/mainmenu/highscore-next-level.png" 'png/mask))
+     (highscore-next-level-mouseover-png (make-object bitmap% "data/mainmenu/highscore-next-level-mouseover.png" 'png/mask))
+     (highscore-previous-level-png (make-object bitmap% "data/mainmenu/highscore-previous-level.png" 'png/mask))
+     (highscore-previous-level-mouseover-png (make-object bitmap% "data/mainmenu/highscore-previous-level-mouseover.png" 'png/mask))
+     
+     ; Funktionella variabler
      (dc (send canvas get-dc))
      (canvas-width *game-canvas-width*)
      (canvas-height *game-canvas-height*)
      (total-width (+ canvas-width *game-sidebar-width*))
-     (menu-position (calculate-menu-position))
-     (highscore-menu-position menu-position)
+     (main-menu-position (calculate-main-menu-position))
+     (highscore-menu-position main-menu-position)
+     (main-menu-button-y-offset 30)
+     (main-menu-button-spacing 10)
      (number-of-highscore-entrys 5)
      (on-main-menu? #t)
      (highscore-list '())
@@ -46,44 +60,69 @@
      (red-brush (make-object brush% red 'solid))
      (font (send the-font-list find-or-create-font 16 "Britannic Bold" 'default 'normal 'normal))
      
-     ; Bilder
-     (background-png (make-object bitmap% "data/textures/background.png"))
-     (menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
-     (menu-background-mask-png (send menu-background-png get-loaded-mask))
-     (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
-     (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png" 'png/mask))
-     (highscore-png (make-object bitmap% "data/mainmenu/highscore.png" 'png/mask))
-     (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png" 'png/mask))
-     
      ; Knappar
      (new-game-button (new menu-button%
                            [label 'new-game]
-                           [position (calculate-button-position 0)]
+                           [position 
+                            (calculate-main-menu-button-position 0
+                                                                 (send new-game-png get-width)
+                                                                 (send new-game-png get-height))]
+                           [width (send new-game-png get-width)]
+                           [height (send new-game-png get-height)]
                            [image new-game-png]
                            [mouseover-image new-game-mouseover-png]))
      
      (highscore-button (new menu-button%
                             [label 'highscore]
-                            [position (calculate-button-position 1)]
+                            [position 
+                             (calculate-main-menu-button-position 1
+                                                                  (send new-game-png get-width)
+                                                                  (send new-game-png get-height))]
+                            [width (send highscore-png get-width)]
+                            [height (send highscore-png get-height)]
                             [image highscore-png]
                             [mouseover-image highscore-mouseover-png]))
      
+     (highscore-next-level-button (new menu-button%
+                                       [label 'next-level]
+                                       [position (make-position (+ (/ total-width 2) 20) 220)] ; TEMP Skriv fkn
+                                       [width (send highscore-next-level-png get-width)]
+                                       [height (send highscore-next-level-png get-height)]
+                                       [image highscore-next-level-png]
+                                       [mouseover-image highscore-next-level-mouseover-png]))
+     
+     (highscore-previous-level-button (new menu-button%
+                                           [label 'previous-level]
+                                           [position (make-position (- (/ total-width 2)
+                                                                       (send highscore-previous-level-png get-width)
+                                                                       20) 220)]
+                                           [width (send highscore-previous-level-png get-width)]
+                                           [height (send highscore-previous-level-png get-height)]
+                                           [image highscore-previous-level-png]
+                                           [mouseover-image highscore-previous-level-mouseover-png]))
+     
      (button-list-main-menu (list new-game-button highscore-button))
-     (button-list-highscore '()))
+     (button-list-highscore-menu (list highscore-next-level-button highscore-previous-level-button)))
 
     (send dc set-text-foreground colour-black)
     (send dc set-font font)
     
-    (define/private (calculate-button-position button-number)
-      (make-position (- (/ total-width 2) (/ button-width 2)) (+ 170 (* (+ button-height 10) button-number))))
+    ; Huvudmenyns position
+    (define/private (calculate-main-menu-position)
+      (let ((menu-width (send menu-background-png get-width))
+            (menu-height (send menu-background-png get-height)))
+        (make-position (- (/ total-width 2) (/ menu-width 2))
+                       (- (/ canvas-height 2) (/ menu-height 2)))))
     
-    (define/private (calculate-menu-position)
-      (let ((top-button-position (calculate-button-position 0)))
-        (make-position (- (get-x-position top-button-position)
-                          (/ (- menu-width button-width) 2))
-                       (- (get-y-position top-button-position)
-                          47))))
-     
+    ; Huvudmenyns knapppositioner
+    (define/private (calculate-main-menu-button-position button-number button-width button-height)
+      (let ((menu-y-position (get-y-position main-menu-position)))
+        (make-position (- (/ total-width 2) (/ button-width 2))
+                       (+ menu-y-position
+                          main-menu-button-y-offset
+                          (* (+ button-height main-menu-button-spacing)
+                             button-number)))))
+    
     (define/private (fill-canvas)
       (send dc draw-bitmap background-png 0 0))
     
@@ -92,7 +131,7 @@
     
     (define/private (draw-background-main-menu)
       (fill-canvas)
-      (draw-masked-png menu-background-png menu-background-mask-png menu-position))
+      (draw-masked-png menu-background-png menu-background-mask-png main-menu-position))
     
     (define/private (draw-buttons button-list)
       (define (help button-list)
@@ -114,7 +153,7 @@
     
     (define/private (draw-highscore)
       (draw-background-main-menu)
-      (draw-buttons button-list-highscore)
+      (draw-buttons button-list-highscore-menu)
       (draw-highscore-table))
      
     (define/private (update-highscore-list)
@@ -122,10 +161,9 @@
                                         download-highscore
                                         highscore-level
                                         number-of-highscore-entrys)))
-      (if (or (not (= highscore-level current-highscore-level))
-              (not (equal? highscore-list server-highscore-list)))
-          (set! highscore-list server-highscore-list)
-          (void))))
+        (if (not (equal? highscore-list server-highscore-list))
+            (set! highscore-list server-highscore-list)
+            (void))))
     
     (define/private (draw-highscore-table)
       (let ((entry-index 0))
@@ -186,16 +224,21 @@
               ((send (car button-list) get-mouseover)
                (car button-list))
               (else (help (cdr button-list)))))
-      (help button-list-main-menu))
+      (if on-main-menu?
+          (help button-list-main-menu)
+          (help button-list-highscore-menu)))
     
     (define/public (handle-mouse-event mouse-x mouse-y event-type)
       ; Hantera mouseover
       (define (help button-list)
         (if (null? button-list)
             (void)
-        (let* ((position (send (car button-list) get-position)) 
+        (let* ((button (car button-list))
+               (position (send button get-position)) 
                (button-x (get-x-position position))
-               (button-y (get-y-position position)))
+               (button-y (get-y-position position))
+               (button-width (send button get-width))
+               (button-height (send button get-height)))
           
           (if (and (>= mouse-x button-x)
                    (<= mouse-x (+ button-x button-width))
@@ -215,10 +258,25 @@
                  (set! on-main-menu? #f)
                  (update-highscore-list)
                  (send new-game-button set-mouseover! #f))
+                ((eq? button-label 'next-level)
+                 (if (not (= highscore-level (- *number-of-maps* 1)))
+                     (begin
+                       (set! highscore-level (+ highscore-level 1))
+                       (update-highscore-list))
+                     (void))
+                 (send highscore-next-level-button set-mouseover! #f))
+                ((eq? button-label 'previous-level)
+                 (if (not (= highscore-level 0))
+                     (begin
+                       (set! highscore-level (- highscore-level 1))
+                       (update-highscore-list))
+                     (void))
+                 (send highscore-previous-level-button set-mouseover! #f))
                 (else (void)))))
       
-      (help button-list-main-menu)
-      ;andra button-lists
+      (if on-main-menu?
+          (help button-list-main-menu)
+          (help button-list-highscore-menu))
       
       (if (eq? event-type 'left-down)
           (let ((mouseover-button (get-mouseover-button)))

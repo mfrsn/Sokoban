@@ -126,7 +126,7 @@
 ;; --------------------------
 ;; Server instantiering
 ;; --------------------------
-(define *port* 23409)
+(define *port* 23408)
 
 (define highscore-server (new server% [port-number *port*]))
 
