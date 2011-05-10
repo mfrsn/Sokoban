@@ -40,11 +40,14 @@
 (define *host* "localhost")
 
 ; Ladda in nivåfilerna
-(define *number-of-maps* 3)
+(define *number-of-maps* 6)
 (define *game-data* (make-vector *number-of-maps*))
-(vector-set! *game-data* 0 (load-level-file "levels/level-2"))
-(vector-set! *game-data* 1 (load-level-file "levels/level-3"))
-(vector-set! *game-data* 2 (load-level-file "levels/level-2"))
+(vector-set! *game-data* 0 (load-level-file "levels/level-1"))
+(vector-set! *game-data* 1 (load-level-file "levels/level-2"))
+(vector-set! *game-data* 2 (load-level-file "levels/level-3"))
+(vector-set! *game-data* 3 (load-level-file "levels/level-4"))
+(vector-set! *game-data* 4 (load-level-file "levels/level-5"))
+(vector-set! *game-data* 5 (load-level-file "levels/level-6"))
 
 ; Starta klient till highscoreservern
 (define *highscore-client* (new client%

@@ -1,6 +1,6 @@
 ;================================================================
 ; PRAM 2011
-; Senaste ändring: ändrade sättet spelaren läggs till 2011-04-01
+; Senaste ändring: fixat till hjälpfunktionerna 2011-05-10
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -35,19 +35,21 @@
         (if (= col map-width)
             (void)
             (begin (cond ((string=? (car col-list) "w")
-                          (add-floor level (make-position col row) 'wall))
+                          (add-floor! level (make-position col row) 'wall))
                          ((string=? (car col-list) "v")
-                          (add-floor level (make-position col row) 'void))
+                          (add-floor! level (make-position col row) 'void))
                          ((string=? (car col-list) "f")
-                          (add-floor level (make-position col row) 'floor))
+                          (add-floor! level (make-position col row) 'floor))
                          ((string=? (car col-list) "g")
-                          (add-goal level (make-position col row)))
+                          (add-goal! level (make-position col row)))
                          ((string=? (car col-list) "b")
-                          (add-block level (make-position col row)))
+                          (add-block! level (make-position col row)))
                          ((string=? (car col-list) "x")
                           (add-player! level (make-position col row)))
                          ((string=? (car col-list) "pt")
-                          (add-powerup level (make-position col row) 'teleport))
+                          (add-powerup! level (make-position col row) 'teleport))
+                         ((string=? (car col-list) "bg")
+                          (add-block-on-goal! level (make-position col row)))
                         (else (error "Unknown building block, given" (car col-list))))
                    (iter-c (+ col 1) (cdr col-list)))))
       
@@ -66,23 +68,30 @@
 
 ; Skapar ett nytt block och lägger detta på ett
 ; nytt golvobjekt. Returnerar sedan golvobjektet.
+;(define (create-block position)
+;  (create-floor 'floor (new block%
+;                            [current-position position])))
+
 (define (create-block position)
-  (create-floor 'floor (new block%
-                            [current-position position])))
+  (new block%
+       [current-position position]))
 
 ; Lägger till ett golvobjekt på brädet
-(define (add-floor board position type)
+(define (add-floor! board position type)
   (send board set-square! position (create-floor type 'empty)))
   
 ; Lägger till ett målområde på brädet
-(define (add-goal board position)
+(define (add-goal! board position)
   (let ((goal (create-floor 'goal 'empty)))
     (send board set-square! position goal)
     (send board add-to-goal-list! goal)))
 
 ; Lägger till ett block+golv på brädet
-(define (add-block board position)
-  (send board set-square! position (create-block position)))
+;(define (add-block! board position)
+;  (send board set-square! position (create-block position)))
+
+(define (add-block! board position)
+  (send board set-square! position (create-floor 'floor (create-block position))))
 
 ; Lägger till spelarens position på brädet
 (define (add-player! board position)
@@ -90,7 +99,7 @@
   (send board set-start-position! position))
   
 ; Lägger till en power-up
-(define (add-powerup board position sub-type)
+(define (add-powerup! board position sub-type)
   (cond ((eq? sub-type 'teleport)
          (send board set-square! position
                (create-floor 'floor
@@ -99,3 +108,9 @@
                                   [power-up-procedure (void)]
                                   [sub-type 'teleport]))))
          (else (error "Invalid power-up attribute. Given:" attribute))))
+
+; Lägger till ett block på en målruta
+(define (add-block-on-goal! board position)
+  (let ((goal (create-floor 'goal (create-block position))))
+    (send board set-square! position goal)
+    (send board add-to-goal-list! goal)))
