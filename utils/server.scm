@@ -50,6 +50,12 @@
       (display client-addr)
       (newline))
     
+    (define/private (save-highscore-file)
+      ())
+    
+    (define/private (load-highscore-file)
+      ())
+    
     ;; --------------------------
     ;; Public
     ;; --------------------------
@@ -62,6 +68,7 @@
       (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
     
     (define/public (start)
+      (load-highscore-file)
       (define listener (tcp-listen port-number))
       (display "Server running on service port ")
       (display port-number)
@@ -117,6 +124,7 @@
                  (server-loop)))))
       (define std (thread server-loop))
       (lambda ()
+        (save-highscore-file)
         (kill-thread std)
         (tcp-close listener)
         (display "Server stopped")))
@@ -126,7 +134,7 @@
 ;; --------------------------
 ;; Server instantiering
 ;; --------------------------
-(define *port* 23409)
+(define *port* 23407)
 
 (define highscore-server (new server% [port-number *port*]))
 
@@ -134,6 +142,9 @@
 (send highscore-server add-highscore! 0)
 (send highscore-server add-highscore! 1)
 (send highscore-server add-highscore! 2)
+(send highscore-server add-highscore! 3)
+(send highscore-server add-highscore! 4)
+(send highscore-server add-highscore! 5)
 
 ; server hanterare, kan endast stänga av servern atm
 (define stop-server (send highscore-server start))

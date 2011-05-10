@@ -1,11 +1,11 @@
 ;================================================================
 ; PRAM 2011
-; Senaste ändring: 2011-04-06
+; Senaste ändring: la till kontroll i next-level! 2011-05-10
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
-; Fil: level-init.scm
+; Fil: game-control.scm
 ; Beskrivning: Hjälpfunktioner för programflödet
 ;================================================================
 
@@ -30,8 +30,11 @@
 
 ; Laddar nästa nivå
 (define (next-level!)
-  (set! *current-level* (+ *current-level* 1))
-  (load-level!))
+  (if (= *current-level* (- *number-of-maps* 1))
+      (main-menu!)
+      (begin
+        (set! *current-level* (+ *current-level* 1))
+        (load-level!))))
 
 ; Laddar tidigare nivå
 (define (previous-level!)
