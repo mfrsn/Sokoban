@@ -85,6 +85,10 @@
     (define/public (get-scorelist-full)
       scorelist)
     
+    ; sätter highscore-listan till new-list
+    (define/public (set-scorelist! new-list)
+      (set! scorelist new-list))
+    
     ; hämtar ut de number-of-entries första poängen
     ; TODO: slippa reversera listan?
     (define/public (get-scorelist number-of-entries)

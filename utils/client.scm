@@ -16,7 +16,8 @@
   (class object%
     (super-new)
     (init-field port-number
-                host-address)
+                host-address
+                (offline-state #f))
     
     ;; --------------------------
     ;; Private
@@ -41,15 +42,25 @@
     (define/public (set-host! new-host)
       (set! host-address new-host))
     
-    (define/public (test-connection)
-      (connect))
+    (define/public (offline?)
+      offline-state)
     
+    ; testar anslutning till servern, om detta misslyckas
+    ; sätts offline-state till #t
+    (define/public (test-connection)
+      (define (handle f)
+        (display "ohfuck ")(display f))
+      (call-with-exception-handler handle (connect)))
+    
+    ; töm highscoren för en given nivå
     (define/public (clear-highscore! level)
       (connect 'clear-highscore level))
     
+    ; ladda upp resultat
     (define/public (upload-score level playername score)
       (connect 'add-score level playername score))
     
+    ; ladda ner en highscore
     (define/public (download-highscore level number-of-entries)
       (connect 'get-highscore level number-of-entries))
     
@@ -60,8 +71,8 @@
 ;; Körs i samband med test-server
 ;; --------------------------
 ;(define test-client (new client%
-;                         [port-number *port*]
-;                         [host-address *host*]))
+;                         [port-number 23408]
+;                         [host-address "localhost"]))
 
 ;(send test-client test-connection)
 
