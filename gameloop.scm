@@ -37,7 +37,7 @@
 
 ; Anslutning till servern
 (define *port* 23408)
-(define *host* "130.236.71.123")
+(define *host* "localhost")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 6)
@@ -53,6 +53,7 @@
 (define *highscore-client* (new client%
                                 [port-number *port*]
                                 [host-address *host*]))
+(send *highscore-client* test-connection)
 
 ; Skapa spelaren
 (define *player* (new player%

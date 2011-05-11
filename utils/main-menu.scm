@@ -13,23 +13,18 @@
   (class object%
     
     (init-field canvas
-                highscore-client
-                (highscore-level 0)
-                (current-highscore-level 0)
-                (highscore-entry-spacing 20)
-                (highscore-score-offset 170)
-                (highscore-name-offset 75)
-                (highscore-x-offset 20)
-                (highscore-y-offset 20))
+                highscore-client)
     
     (field
      
      ; Bilder
      (background-png (make-object bitmap% "data/textures/background.png"))
-     (menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
-     (menu-background-mask-png (send menu-background-png get-loaded-mask))
+     (main-menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
+     (menu-background-mask-png (send main-menu-background-png get-loaded-mask))
      (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
      (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png" 'png/mask))
+     (highscore-background-png (make-object bitmap% "data/mainmenu/highscore-background.png" 'png/mask))
+     (highscore-background-mask-png (send highscore-background-png get-loaded-mask))
      (highscore-png (make-object bitmap% "data/mainmenu/highscore.png" 'png/mask))
      (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png" 'png/mask))
      (highscore-next-level-png (make-object bitmap% "data/mainmenu/highscore-next-level.png" 'png/mask))
@@ -42,8 +37,19 @@
      (canvas-width *game-canvas-width*)
      (canvas-height *game-canvas-height*)
      (total-width (+ canvas-width *game-sidebar-width*))
-     (main-menu-position (calculate-main-menu-position))
-     (highscore-menu-position main-menu-position)
+     (main-menu-position (calculate-menu-background-position 'main-menu))
+     (highscore-menu-position (calculate-menu-background-position 'highscore-menu))
+     (highscore-level 0)
+     (highscore-title-x-offset 170)
+     (highscore-title-y-offset 20)
+     (highscore-button-center-x-offset 20)
+     (highscore-button-bottom-y-offset 20)
+     (highscore-entry-spacing 20)
+     (highscore-score-offset 260)
+     (highscore-name-offset 100)
+     (highscore-x-offset 40)
+     (highscore-y-offset 20)
+     (highscore-header-y-offset 25)
      (main-menu-button-y-offset 30)
      (main-menu-button-spacing 10)
      (number-of-highscore-entrys 5)
@@ -63,65 +69,93 @@
      ; Knappar
      (new-game-button (new menu-button%
                            [label 'new-game]
-                           [position 
-                            (calculate-main-menu-button-position 0
-                                                                 (send new-game-png get-width)
-                                                                 (send new-game-png get-height))]
-                           [width (send new-game-png get-width)]
-                           [height (send new-game-png get-height)]
                            [image new-game-png]
                            [mouseover-image new-game-mouseover-png]))
      
      (highscore-button (new menu-button%
                             [label 'highscore]
-                            [position 
-                             (calculate-main-menu-button-position 1
-                                                                  (send new-game-png get-width)
-                                                                  (send new-game-png get-height))]
-                            [width (send highscore-png get-width)]
-                            [height (send highscore-png get-height)]
                             [image highscore-png]
                             [mouseover-image highscore-mouseover-png]))
      
      (highscore-next-level-button (new menu-button%
                                        [label 'next-level]
-                                       [position (make-position (+ (/ total-width 2) 20) 220)] ; TEMP Skriv fkn
-                                       [width (send highscore-next-level-png get-width)]
-                                       [height (send highscore-next-level-png get-height)]
                                        [image highscore-next-level-png]
                                        [mouseover-image highscore-next-level-mouseover-png]))
      
      (highscore-previous-level-button (new menu-button%
                                            [label 'previous-level]
-                                           [position (make-position (- (/ total-width 2)
-                                                                       (send highscore-previous-level-png get-width)
-                                                                       20) 220)]
-                                           [width (send highscore-previous-level-png get-width)]
-                                           [height (send highscore-previous-level-png get-height)]
                                            [image highscore-previous-level-png]
                                            [mouseover-image highscore-previous-level-mouseover-png]))
      
      (button-list-main-menu (list new-game-button highscore-button))
      (button-list-highscore-menu (list highscore-next-level-button highscore-previous-level-button)))
-
+    
+    ; Nödvändiga exekveringar
     (send dc set-text-foreground colour-black)
     (send dc set-font font)
+    (set-button-positions!)
     
-    ; Huvudmenyns position
-    (define/private (calculate-main-menu-position)
-      (let ((menu-width (send menu-background-png get-width))
-            (menu-height (send menu-background-png get-height)))
-        (make-position (- (/ total-width 2) (/ menu-width 2))
-                       (- (/ canvas-height 2) (/ menu-height 2)))))
+    ; Sätt knapparnas positioner
+    (define/private (set-button-positions!)
+      (let ((button-counter 0))
+        (define (help button-list identifier)
+          (if (null? button-list)
+              (void)
+              (let ((button (car button-list)))
+                (cond ((eq? identifier 'main-menu-buttons)
+                       (send button set-position! (calculate-main-menu-button-position button
+                                                                                       button-counter))
+                       (set! button-counter (+ button-counter 1)))
+                      ((eq? identifier 'highscore-menu-buttons)
+                       (send button set-position! (calculate-highscore-menu-button-position button)))
+                      (else (error "Unknown identifier: " identifier)))
+                (help (cdr button-list) identifier))))
+        (help button-list-main-menu 'main-menu-buttons)
+        (help button-list-highscore-menu 'highscore-menu-buttons)))
     
     ; Huvudmenyns knapppositioner
-    (define/private (calculate-main-menu-button-position button-number button-width button-height)
+    (define/private (calculate-main-menu-button-position button button-number)
       (let ((menu-y-position (get-y-position main-menu-position)))
-        (make-position (- (/ total-width 2) (/ button-width 2))
+        (make-position (- (/ total-width 2) (/ (send button get-width) 2))
                        (+ menu-y-position
                           main-menu-button-y-offset
-                          (* (+ button-height main-menu-button-spacing)
+                          (* (+ (send button get-height) 
+                                main-menu-button-spacing)
                              button-number)))))
+    
+    ; Highscoremenyns knapppositioner
+    (define/private (calculate-highscore-menu-button-position button)
+      (let ((label (send button get-label)))
+        (cond ((eq? label 'next-level)
+               (make-position (+ (/ total-width 2) highscore-button-center-x-offset)
+                              (- (+ (get-y-position highscore-menu-position)
+                                    (send highscore-background-png get-height))
+                                 (send button get-height)
+                                 highscore-button-bottom-y-offset)))
+              ((eq? label 'previous-level)
+               (make-position (- (/ total-width 2)
+                                 highscore-button-center-x-offset
+                                 (send button get-width))
+                              (- (+ (get-y-position highscore-menu-position)
+                                    (send highscore-background-png get-height))
+                                 (send button get-height)
+                                 highscore-button-bottom-y-offset)))
+              (else (error "Invalid label: " label)))))
+    
+    ; Menypositioner
+    (define/private (calculate-menu-background-position identifier)
+      (let ((image-width 0)
+            (image-height 0))
+        (cond ((eq? identifier 'main-menu)
+               (set! image-width (send main-menu-background-png get-width))
+               (set! image-height (send main-menu-background-png get-height)))
+              ((eq? identifier 'highscore-menu)
+               (set! image-width (send highscore-background-png get-width))
+               (set! image-height (send highscore-background-png get-height)))
+              (else (error "Unknown identifier in: " identifier)))
+        (make-position (- (/ total-width 2) (/ image-width 2))
+                       (- (/ canvas-height 2) (/ image-height 2)))))
+    
     
     (define/private (fill-canvas)
       (send dc draw-bitmap background-png 0 0))
@@ -131,7 +165,11 @@
     
     (define/private (draw-background-main-menu)
       (fill-canvas)
-      (draw-masked-png menu-background-png menu-background-mask-png main-menu-position))
+      (draw-masked-png main-menu-background-png menu-background-mask-png main-menu-position))
+    
+    (define/private (draw-background-highscore-menu)
+      (fill-canvas)
+      (draw-masked-png highscore-background-png highscore-background-mask-png highscore-menu-position))
     
     (define/private (draw-buttons button-list)
       (define (help button-list)
@@ -152,7 +190,7 @@
       (draw-buttons button-list-main-menu))
     
     (define/private (draw-highscore)
-      (draw-background-main-menu)
+      (draw-background-highscore-menu)
       (draw-buttons button-list-highscore-menu)
       (draw-highscore-table))
      
@@ -170,32 +208,43 @@
         
         (define (help highscore-list)
           (if (null? highscore-list)
-              (void)
-              (begin
+              (no-entries-found)
+              (let ((cdr-list (cdr highscore-list)))
                 (print-highscore-entry (car highscore-list) entry-index)
                 (set! entry-index (+ entry-index 1))
-                (help (cdr highscore-list)))))
+                (if (null? cdr-list)
+                    (void)
+                    (help cdr-list)))))
+        
+        (define (no-entries-found)
+          (send dc draw-text "No entries found!" (- (/ total-width 2) 75) (- (/ canvas-height 2) 20)))
         
         (define (calculate-entry-draw-position entry-type entry-index)
           (cond ((eq? entry-type 'index)
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset)
                                 (+ (get-y-position highscore-menu-position)
-                                   (* highscore-y-offset 2)
+                                   highscore-y-offset
+                                   highscore-header-y-offset
+                                   highscore-title-y-offset
                                    (* highscore-entry-spacing entry-index))))
                 ((eq? entry-type 'name)
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset
                                    highscore-name-offset)
                                 (+ (get-y-position highscore-menu-position)
-                                   (* highscore-y-offset 2)
+                                   highscore-y-offset 
+                                   highscore-header-y-offset
+                                   highscore-title-y-offset
                                    (* highscore-entry-spacing entry-index))))
                 ((eq? entry-type 'score)
                  (make-position (+ (get-x-position highscore-menu-position)
                                    highscore-x-offset
                                    highscore-score-offset)
-                                 (+ (get-y-position highscore-menu-position)
-                                   (* highscore-y-offset 2)
+                                (+ (get-y-position highscore-menu-position)
+                                   highscore-y-offset
+                                   highscore-header-y-offset
+                                   highscore-title-y-offset
                                    (* highscore-entry-spacing entry-index))))
                 (else (void))))
         
@@ -204,12 +253,18 @@
                 (name-position (calculate-entry-draw-position 'name entry-index))
                 (score-position (calculate-entry-draw-position 'score entry-index)))
             
-            (send dc draw-text (number->string (+ entry-index 1)) (get-x-position index-position) (get-y-position index-position))
+            (send dc draw-text (string-append (number->string (+ entry-index 1)) ".") (get-x-position index-position) (get-y-position index-position))
             (send dc draw-text (car entry) (get-x-position name-position) (get-y-position name-position))
             (send dc draw-text (number->string (cadr entry)) (get-x-position score-position) (get-y-position score-position))))
         
         (define (draw-titles)
-          (let ((y-position (+ (get-y-position highscore-menu-position) highscore-y-offset)))
+          (let ((y-position (+ (get-y-position highscore-menu-position) highscore-header-y-offset highscore-title-y-offset)))
+            (send dc draw-text
+                  (string-append "Level " (number->string (+ highscore-level 1)))
+                  (+ (get-x-position highscore-menu-position)
+                     highscore-title-x-offset)
+                  (+ (get-y-position highscore-menu-position)
+                     highscore-title-y-offset))
             (send dc draw-text "Rank:" (+ (get-x-position highscore-menu-position) highscore-x-offset) y-position)
             (send dc draw-text "Name:" (get-x-position (calculate-entry-draw-position 'name 0)) y-position)
             (send dc draw-text "Score:" (get-x-position (calculate-entry-draw-position 'score 0)) y-position)))

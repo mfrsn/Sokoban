@@ -11,16 +11,22 @@
   (class object%
     
     (init-field label
-                position
-                width
-                height
                 image
                 mouseover-image)
     
-    (field (mouseover? #f))
+    (field (mouseover? #f)
+           (width #f)
+           (height #f)
+           (position #f))
+    
+    (set! width (send image get-width))
+    (set! height (send image get-height))
     
     (define/public (set-mouseover! pred)
       (set! mouseover? pred))
+    
+    (define/public (set-position! new-position)
+      (set! position new-position))
     
     (define/public (get-mouseover)
       mouseover?)
