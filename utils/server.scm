@@ -10,6 +10,7 @@
 ;================================================================
 
 (require racket/tcp)
+(require 2htdp/batch-io)
 
 (load "../datatypes/highscore.scm")
 
@@ -50,11 +51,36 @@
       (display client-addr)
       (newline))
     
+    ; fungerar ej
     (define/private (save-highscore-file)
-      ())
-    
+      (define *file* (open-output-file "highscore.txt" 'append))
+      
+      (define (help iter-lst)
+        (if (null? iter-lst)
+            (void)
+            (begin
+              (write (car iter-lst) *file*)
+              (write "," *file*))))
+      
+      (help highscore-list)
+      (close-output-port *file*))
+   
+    ; otestad!!!!!
+    ; laddar in highscorelistor separerade av komman
     (define/private (load-highscore-file)
-      ())
+      (set! highscore-list '())
+      (define highscores (read-csv-file "highscore.txt"))
+      
+      (define (help iter-lst iter-num)
+        (cond ((null? iter-lst) (void))
+              (else
+               (set! highscore-list (cons (cons iter-num
+                                                (new highscore% [level iter-num]
+                                                                [scorelist (car iter-lst)]))
+                                          highscore-list))
+               (help (cdr iter-lst) (+ iter-num 1)))))
+      
+      (help highscores 0))
     
     ;; --------------------------
     ;; Public
@@ -68,7 +94,7 @@
       (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
     
     (define/public (start)
-      (load-highscore-file)
+      ;(load-highscore-file)
       (define listener (tcp-listen port-number))
       (display "Server running on service port ")
       (display port-number)
@@ -124,7 +150,7 @@
                  (server-loop)))))
       (define std (thread server-loop))
       (lambda ()
-        (save-highscore-file)
+        ;(save-highscore-file)
         (kill-thread std)
         (tcp-close listener)
         (display "Server stopped")))
@@ -138,6 +164,9 @@
 
 (define highscore-server (new server% [port-number *port*]))
 
+; server hanterare, kan endast stänga av servern atm
+(define stop-server (send highscore-server start))
+
 ; skapa highscore-listor. TODO: (automatisk numrering?)
 (send highscore-server add-highscore! 0)
 (send highscore-server add-highscore! 1)
@@ -145,6 +174,3 @@
 (send highscore-server add-highscore! 3)
 (send highscore-server add-highscore! 4)
 (send highscore-server add-highscore! 5)
-
-; server hanterare, kan endast stänga av servern atm
-(define stop-server (send highscore-server start))
