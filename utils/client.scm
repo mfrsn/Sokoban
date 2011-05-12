@@ -48,9 +48,7 @@
     ; testar anslutning till servern, om detta misslyckas
     ; sätts offline-state till #t
     (define/public (test-connection)
-      (define (handle f)
-        (display "ohfuck ")(display f))
-      (call-with-exception-handler handle (connect)))
+      (connect))
     
     ; töm highscoren för en given nivå
     (define/public (clear-highscore! level)
