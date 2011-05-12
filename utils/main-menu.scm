@@ -18,7 +18,8 @@
     (field
      
      ; Bilder
-     (background-png (make-object bitmap% "data/textures/background.png"))
+     (background-png (make-object bitmap% "data/textures/background2.png"))
+     (background-highscore-png (make-object bitmap% "data/textures/background-highscore.png")) ; Nytt variabelnamn krävs
      (main-menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
      (menu-background-mask-png (send main-menu-background-png get-loaded-mask))
      (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
@@ -158,7 +159,9 @@
     
     
     (define/private (fill-canvas)
-      (send dc draw-bitmap background-png 0 0))
+      (if on-main-menu?
+          (send dc draw-bitmap background-png 0 0)
+          (send dc draw-bitmap background-highscore-png 0 0))) ; Snyggare namn
     
     (define/private (draw-masked-png png mask position)
       (send dc draw-bitmap png (get-x-position position) (get-y-position position) 'solid white mask))
