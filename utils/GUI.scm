@@ -125,16 +125,44 @@
                           [parent player-name-dialog]
                           [alignment '(center center)]))
 
-  ; Knappar
-  (define ok-button (new button%
-                         [label "Ok"]
-                         [parent dialog-panel]
-                         [enabled #t]
-                         [min-width 60]
-                         [callback (lambda (button event)
-                                     (set! *player-name* (send name-field get-value))
-                                     (send player-name-dialog show #f)
-                                     (send *game-canvas* focus))]))
+; Knappar
+(define ok-button (new button%
+                       [label "Ok"]
+                       [parent dialog-panel]
+                       [min-width 60]
+                       [callback (lambda (button event)
+                                   (let* ((entered-name (send name-field get-value))
+                                          (name-length (string-length entered-name)))
+                                     (display name-length)
+                                     (cond ((= name-length 0)
+                                            (send name-length-error-message 
+                                                  set-label "You have to enter your name!")
+                                            (send name-length-error-dialog show #t))
+                                           ((> name-length 12)
+                                            (send name-length-error-message 
+                                                  set-label "Your name can only be up to 12 characters long!")
+                                            (send name-length-error-dialog show #t))
+                                           (else
+                                            (set! *player-name* entered-name)
+                                            (send player-name-dialog show #f)
+                                            (send *game-canvas* focus)))))]))
+; Errormeddelande vid namnangivning
+(define name-length-error-dialog (new dialog%
+                                      [label "Error!"]
+                                      [alignment '(center center)]
+                                      [stretchable-width #t]
+                                      [stretchable-height #t]))
+
+(define name-length-error-message (new message%
+                                       [parent name-length-error-dialog]
+                                       [label ""]
+                                       [auto-resize #t]))
+
+(define name-length-error-ok-button (new button%
+                                         [parent name-length-error-dialog]
+                                         [label "Ok"]
+                                         [callback (lambda (button event)
+                                                     (send name-length-error-dialog show #f))]))
 
 
   

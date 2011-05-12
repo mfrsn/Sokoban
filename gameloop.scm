@@ -53,7 +53,7 @@
 (define *highscore-client* (new client%
                                 [port-number *port*]
                                 [host-address *host*]))
-(send *highscore-client* test-connection)
+;(send *highscore-client* test-connection)
 
 ; Skapa spelaren
 (define *player* (new player%
