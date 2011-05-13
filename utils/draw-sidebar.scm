@@ -22,17 +22,15 @@
      
      ; Palett
      (colour-black (make-object color% 0 0 0))
-     (colour-white (make-object color% 255 255 255))
-     (black-brush (make-object brush% "BLACK" 'solid))
-     (blue-brush (make-object brush% "BLUE" 'solid))
+     (colour-text (make-object color% 215 215 215))
      
      ; Bildfiler
      (background-png (make-object bitmap% "data/textures/background.png"))
      (teleport-icon-png (make-object bitmap% "data/sidebar/teleport-icon.png" 'png/mask))
      (teleport-icon-mask (send teleport-icon-png get-loaded-mask))
-     (font (send the-font-list find-or-create-font 16 "Britannic Bold" 'default 'normal 'normal)))
+     (font (send the-font-list find-or-create-font 16 "Arial Rounded MT Bold" 'default 'normal 'normal)))
     
-    (send dc set-text-foreground colour-white)
+    (send dc set-text-foreground colour-text)
     (send dc set-font font)
     
     (define/private (fill-canvas)
@@ -44,13 +42,13 @@
     
     (define/private (draw-text)
       (let ((count (send *counter* get-count)))
-        (send dc draw-text "Steps" 22 0)
+        (send dc draw-text "Steps" 20 0)
         (send dc draw-text "Power-ups" 3 65)
         (cond ((< count 10)
-               (send dc draw-text (number->string count) 40 35))
+               (send dc draw-text (number->string count) 42 35))
               ((< count 100)
-               (send dc draw-text (number->string count) 35 35))
-              (else (send dc draw-text (number->string count) 27 35)))))
+               (send dc draw-text (number->string count) 37 35))
+              (else (send dc draw-text (number->string count) 30 35)))))
         
     
     (define/private (draw-power-ups)

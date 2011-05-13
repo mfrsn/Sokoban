@@ -18,15 +18,20 @@
     (field
      
      ; Bilder
-     (background-png (make-object bitmap% "data/textures/background.png"))
+     (background-png (make-object bitmap% "data/textures/background-main-menu.png"))
+     (background-highscore-png (make-object bitmap% "data/textures/background-highscore.png")) ; Nytt variabelnamn krävs
      (main-menu-background-png (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
-     (menu-background-mask-png (send main-menu-background-png get-loaded-mask))
+     (main-menu-background-mask-png (send main-menu-background-png get-loaded-mask))
      (new-game-png (make-object bitmap% "data/mainmenu/new-game.png" 'png/mask))
      (new-game-mouseover-png (make-object bitmap% "data/mainmenu/new-game-mouseover.png" 'png/mask))
-     (highscore-background-png (make-object bitmap% "data/mainmenu/highscore-background.png" 'png/mask))
-     (highscore-background-mask-png (send highscore-background-png get-loaded-mask))
      (highscore-png (make-object bitmap% "data/mainmenu/highscore.png" 'png/mask))
      (highscore-mouseover-png (make-object bitmap% "data/mainmenu/highscore-mouseover.png" 'png/mask))
+     (about-png (make-object bitmap% "data/mainmenu/about.png" 'png/mask))
+     (about-mouseover-png (make-object bitmap% "data/mainmenu/about-mouseover.png" 'png/mask))
+     
+     ; Highscoremenyns bilder
+     (highscore-background-png (make-object bitmap% "data/mainmenu/highscore-background.png" 'png/mask))
+     (highscore-background-mask-png (send highscore-background-png get-loaded-mask))
      (highscore-next-level-png (make-object bitmap% "data/mainmenu/highscore-next-level.png" 'png/mask))
      (highscore-next-level-mouseover-png (make-object bitmap% "data/mainmenu/highscore-next-level-mouseover.png" 'png/mask))
      (highscore-previous-level-png (make-object bitmap% "data/mainmenu/highscore-previous-level.png" 'png/mask))
@@ -50,21 +55,18 @@
      (highscore-x-offset 40)
      (highscore-y-offset 20)
      (highscore-header-y-offset 25)
-     (main-menu-button-y-offset 30)
+     (main-menu-button-y-offset 20)
      (main-menu-button-spacing 10)
      (number-of-highscore-entrys 5)
      (on-main-menu? #t)
      (highscore-list '())
          
      ; Palett
-     (white (make-object color% 255 255 255))
-     (red (make-object color% 255 0 0))
+     (colour-text (make-object color% 215 215 215))
      (colour-black (make-object color% 0 0 0))
      
      ; Verktyg
-     (white-brush (make-object brush% white 'solid))
-     (red-brush (make-object brush% red 'solid))
-     (font (send the-font-list find-or-create-font 16 "Britannic Bold" 'default 'normal 'normal))
+     (font (send the-font-list find-or-create-font 16 "Arial Rounded MT Bold" 'default 'normal 'normal))
      
      ; Knappar
      (new-game-button (new menu-button%
@@ -77,6 +79,11 @@
                             [image highscore-png]
                             [mouseover-image highscore-mouseover-png]))
      
+     (about-button (new menu-button%
+                        [label 'about]
+                        [image about-png]
+                        [mouseover-image about-mouseover-png]))
+     
      (highscore-next-level-button (new menu-button%
                                        [label 'next-level]
                                        [image highscore-next-level-png]
@@ -87,11 +94,11 @@
                                            [image highscore-previous-level-png]
                                            [mouseover-image highscore-previous-level-mouseover-png]))
      
-     (button-list-main-menu (list new-game-button highscore-button))
+     (button-list-main-menu (list new-game-button highscore-button about-button))
      (button-list-highscore-menu (list highscore-next-level-button highscore-previous-level-button)))
     
     ; Nödvändiga exekveringar
-    (send dc set-text-foreground colour-black)
+    (send dc set-text-foreground colour-text)
     (send dc set-font font)
     (set-button-positions!)
     
@@ -158,14 +165,16 @@
     
     
     (define/private (fill-canvas)
-      (send dc draw-bitmap background-png 0 0))
+      (if on-main-menu?
+          (send dc draw-bitmap background-png 0 0)
+          (send dc draw-bitmap background-highscore-png 0 0))) ; Snyggare namn
     
     (define/private (draw-masked-png png mask position)
-      (send dc draw-bitmap png (get-x-position position) (get-y-position position) 'solid white mask))
+      (send dc draw-bitmap png (get-x-position position) (get-y-position position) 'solid colour-black mask))
     
     (define/private (draw-background-main-menu)
       (fill-canvas)
-      (draw-masked-png main-menu-background-png menu-background-mask-png main-menu-position))
+      (draw-masked-png main-menu-background-png main-menu-background-mask-png main-menu-position))
     
     (define/private (draw-background-highscore-menu)
       (fill-canvas)
@@ -217,7 +226,7 @@
                     (help cdr-list)))))
         
         (define (no-entries-found)
-          (send dc draw-text "No entries found!" (- (/ total-width 2) 75) (- (/ canvas-height 2) 20)))
+          (send dc draw-text "No entries found!" (- (/ total-width 2) 80) (- (/ canvas-height 2) 20)))
         
         (define (calculate-entry-draw-position entry-type entry-index)
           (cond ((eq? entry-type 'index)
@@ -262,7 +271,7 @@
             (send dc draw-text
                   (string-append "Level " (number->string (+ highscore-level 1)))
                   (+ (get-x-position highscore-menu-position)
-                     highscore-title-x-offset)
+                     highscore-x-offset)
                   (+ (get-y-position highscore-menu-position)
                      highscore-title-y-offset))
             (send dc draw-text "Rank:" (+ (get-x-position highscore-menu-position) highscore-x-offset) y-position)
@@ -312,7 +321,7 @@
                 ((eq? button-label 'highscore)
                  (set! on-main-menu? #f)
                  (update-highscore-list)
-                 (send new-game-button set-mouseover! #f))
+                 (send highscore-button set-mouseover! #f))
                 ((eq? button-label 'next-level)
                  (if (not (= highscore-level (- *number-of-maps* 1)))
                      (begin
