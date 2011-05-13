@@ -1,6 +1,6 @@
 ;====================================================================
 ; PRAM 2011
-; Senaste ändring: Power-up funktionalitet implementerad 2011-04-17
+; Senaste ändring: Ångra-knapp tillagd 2011-05-13
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
@@ -37,7 +37,7 @@
 
 ; Anslutning till servern
 (define *port* 23408)
-(define *host* "localhost")
+(define *host* "130.236.70.252")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 7)
@@ -112,6 +112,8 @@
               (send *player* move! 'right))
              ((eq? key #\p)
               (send *player* use-power-up))
+             ((eq? key #\u)
+              (send *current-board* undo! *player*))
              (else (void)))
        
        ; Do shit 'n stuff here
