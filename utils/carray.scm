@@ -51,6 +51,7 @@
     (define/public (get-width) width)
     (define/public (get-height) height)
     (define/public (get-array) array)
+    (define/public (set-array! new-array) (set! array new-array))
     
     ; Funktion som returnerar värdet för en 2D-array 'array' på address [x,y].
     (define/public (get-element x y)
@@ -63,6 +64,5 @@
       (if (valid-address? x y) 
           (vector-set! (vector-ref array y) x element)
           (error "Address is out of bounds." x y)))
-    
     
     (super-new)))

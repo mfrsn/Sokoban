@@ -1,7 +1,7 @@
 ;============================================================
 ; PRAM 2011
-; Senaste ändring: Implementerat power-up funktionalitet
-; 2011-04-08
+; Senaste ändring: Lagt till funktionalitet för att ångra sina drag
+; 2011-05-13
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -27,6 +27,7 @@
            
            ; Lista med målområdesobjekten för effektiv åtkomst vid vinstkontroll
            (list-of-goals '())
+           (history-list '())
            (start-position #f))
     
     ; #### Private ####
@@ -53,12 +54,14 @@
                     (not (on-goal? block-position)))
                (do-move! block block-position (first-available-goal-position))
                (do-move! player player-position block-position)
+               (set! history-list (cons (list 'teleport player-position block) history-list))
                (send player clear-power-up-queue!)
                (send *counter* increase!))
               ((and (is-empty? new-position)
                     (check-square new-position))
                (do-move! block block-position new-position)
                (do-move! player player-position block-position)
+               (set! history-list (cons (list 'block player-position block) history-list))
                (send *counter* increase!))
               (else (void)))))
     
@@ -69,6 +72,7 @@
       (send (get-object power-up-position) delete-object!)
       (send *game-canvas* stop-animation power-up-position)
       (do-move! player player-position power-up-position)
+      (set! history-list (cons (list 'powerup player-position power-up) history-list))
       (send *counter* increase!)
       (play-sound "data/sounds/power-up.wav" #t)
       (send *game-canvas* run-animation power-up-position))
@@ -81,6 +85,16 @@
         (cond ((eq? floor-object-type 'wall) #f)
               ((eq? floor-object-type 'void) #f)
               (else (send floor-object get-object)))))
+    
+    ; hjälpfunktioner för "ångra"-funktionalitet
+    (define/private (get-history-type move)
+      (car move))
+    
+    (define/private (get-history-position move)
+      (car (cdr move)))
+    
+    (define/private (get-history-object move)
+      (car (cdr (cdr move))))
     
     ; #### Public ####
     
@@ -149,19 +163,69 @@
             (if (is-empty? new-position)
                 (begin
                   (do-move! object current-position new-position)
-                  (send *counter* increase!))
+                  (send *counter* increase!)
+                  (set! history-list (cons (list 'player current-position 'dont-care) history-list)))
                 (if (eq? (send check-square-result get-type) 'block)
                     (handle-block-move object check-square-result current-position new-position direction)
                     (handle-power-up object check-square-result current-position new-position))))))
     
+    (define/public (add-use-power-up-history! power-up-object)
+      (set! history-list (cons (list 'use-power-up 'dont-care power-up-object) history-list)))
+    
+    ; Ängrar senasteförflyttningen. Alla förflyttningar sparas, inklusive
+    ; teleporteringar. Historiklistan har följande format:
+    ; (('type player-position object) ('type player-position object) ..)
+    ; där object är blocket/power-up'en som påverkades (alt. 'dont-care)
+    (define/public (undo! player)
+      (if (null? history-list)
+          (void)
+          (let* ((current-move (car history-list))
+                 (move-type (get-history-type current-move))
+                 (player-pos (send player get-position)))
+            (cond ((eq? move-type 'player)
+                   (do-move! player player-pos (get-history-position current-move))
+                   (send *counter* decrease!))
+                  ((eq? move-type 'block)
+                   (define block (get-history-object current-move))
+                   (do-move! player player-pos (get-history-position current-move))
+                   (do-move! block (send block get-position) player-pos)
+                   (send *counter* decrease!))
+                  ((eq? move-type 'teleport)
+                   (define block (get-history-object current-move))
+                   (send player add-power-up! (new power-up%
+                                                   [current-position 'player]
+                                                   [power-up-procedure (void)]
+                                                   [sub-type 'teleport]))
+                   (do-move! player player-pos (get-history-position current-move))
+                   (do-move! block (send block get-position) player-pos)
+                   (send *counter* decrease!))
+                  ((eq? move-type 'powerup)
+                   (do-move! player player-pos (get-history-position current-move))
+                   (send player remove-one-powerup!)
+                   (add-powerup! this player-pos 'teleport)
+                   (send *counter* decrease!))
+                  ((eq? move-type 'use-power-up)
+                   (send player clear-power-up-queue!)
+                   (send player add-power-up! (get-history-object current-move))))
+                   
+            (set! history-list (cdr history-list)))))
+    
+    ; skriver ut brädet i textform
     (define/public (print-board)
       (define (iter-r row)
         
         (define (iter-c col)
           (cond ((= col size-x) (void))
-                (else (if (eq? (send (get-object (make-position col row)) get-object) 'empty)
-                          (begin (display (send (get-object (make-position col row)) get-type)) (display " "))
-                          (begin (display (send (send (get-object (make-position col row)) get-object) get-type)) (display " ")))
+                (else (if (eq? (send (get-object (make-position col row))
+                                     get-object)
+                               'empty)
+                          (begin (display (send (get-object (make-position col row))
+                                                get-type))
+                                 (display " "))
+                          (begin (display (send (send (get-object (make-position col row))
+                                                      get-object)
+                                                get-type))
+                                 (display " ")))
                       (iter-c (+ col 1)))))
         
         (cond ((= row size-y) (void))

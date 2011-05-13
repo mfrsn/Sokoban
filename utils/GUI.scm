@@ -133,7 +133,6 @@
                        [callback (lambda (button event)
                                    (let* ((entered-name (send name-field get-value))
                                           (name-length (string-length entered-name)))
-                                     (display name-length)
                                      (cond ((= name-length 0)
                                             (send name-length-error-message 
                                                   set-label "You have to enter your name!")

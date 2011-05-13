@@ -1,6 +1,6 @@
 ;=====================================================
 ; PRAM 2011
-; Senaste ändring: Power-up funktionalitet 2011-04-17
+; Senaste ändring: modifierade power-up hantering 2011-05-13
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -54,6 +54,12 @@
     (define/public (clear-power-up-queue!)
       (set! power-up-queue 'empty))
     
+    (define/public (remove-one-powerup!)
+      (if (null? power-ups)
+          (void)
+          (set! power-ups (cdr power-ups)))
+      (clear-power-up-queue!))
+    
     (define/public (clear-power-ups!)
       (set! power-ups '()))
     
@@ -75,7 +81,8 @@
                   ((and (eq? sub-type 'teleport)
                         (eq? power-up-queue 'empty))
                    (set! power-up-queue 'teleport)
-                   (set! power-ups (cdr power-ups)))
+                   (set! power-ups (cdr power-ups))
+                   (send current-board add-use-power-up-history! power-up))
                   (else (void))))))
               
               
