@@ -174,3 +174,4 @@
 (send highscore-server add-highscore! 3)
 (send highscore-server add-highscore! 4)
 (send highscore-server add-highscore! 5)
+(send highscore-server add-highscore! 6)

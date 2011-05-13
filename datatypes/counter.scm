@@ -34,7 +34,4 @@
     (define/public (get-count)
       count)
     
-    (define/public (report-score player-name)
-      (display "Level ")(display level)(display ": ")(display count)(newline))
-    
     (super-new)))

@@ -20,7 +20,8 @@
   (send *player* clear-power-ups!)
   (send *counter* set-level! *current-level*)
   (send *game-canvas* redraw)
-  (send *game-sidebar* draw))
+  (send *game-sidebar* draw)
+  (send *game-canvas* focus))
 
 ; Återställer nuvarande nivån
 (define (reset-level!)
@@ -59,7 +60,7 @@
 (define (main-menu!)
   (send *main-menu-animation-timer* start 50)
   (set! *main-menu-active?* #t)
-  (send *main-menu* set-on-menu! #t)
+  (send *main-menu* set-on-main-menu! #t)
   (send *game-canvas* stop-all-animations)
   (send *main-menu* draw)
   (send *game-sidebar* draw-main-menu))
