@@ -255,8 +255,8 @@
       canvas-width)
     
     ; Kör en animation som ligger "ovanpå" spelaren.
-    (define/public (run-player-animation position identifier)
-      (cond ((eq? indentifier 'blink)
+    (define/public (run-animation position identifier)
+      (cond ((eq? identifier 'blink)
              (make-new-animation position blink-list player-png))
             (else (error "Unknown gif identifier:" identifier))))
     
