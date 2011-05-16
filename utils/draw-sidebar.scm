@@ -79,7 +79,8 @@
     
     ; Ritar då huvudmenyn är igång
     (define/public (draw-main-menu)
-      (fill-canvas))
+      (fill-canvas)
+      (void))
     
     (define/public (get-font)
       (send dc get-font))

@@ -154,7 +154,7 @@
 (define *main-menu-animation-timer*
   (new timer%
        [interval 500]
-       [notify-callback draw-main-menu]))
+       [notify-callback (send *game-canvas* on-paint)]))
 (send *main-menu-animation-timer* stop)
 
 (define *game-music-timer*
