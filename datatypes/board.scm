@@ -84,7 +84,7 @@
       (set! history-list (cons (list 'powerup player-position power-up) history-list))
       (send *counter* increase!)
       (play-sound "data/sounds/power-up.wav" #t)
-      (send *game-canvas* run-animation power-up-position))
+      (send *game-canvas* run-animation power-up-position 'blink))
     
     ; Kontrollerar om förflyttning är möjlig. Om block eller powerup så returneras
     ; respektive objekt.

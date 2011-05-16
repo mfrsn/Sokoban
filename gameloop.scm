@@ -26,7 +26,6 @@
 (load "utils/draw.scm")
 (load "utils/game-control.scm")
 (load "utils/cgif.scm")
-(load "utils/csidebar.scm")
 (load "utils/draw-sidebar.scm")
 (load "utils/main-menu.scm")
 (load "utils/main-menu-button.scm")
@@ -37,7 +36,7 @@
 
 ; Anslutning till servern
 (define *port* 23408)
-(define *host* "130.236.70.204")
+(define *host* "localhost")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 7)
