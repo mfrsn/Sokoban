@@ -36,7 +36,7 @@
 
 ; Anslutning till servern
 (define *port* 23408)
-(define *host* "130.236.70.204")
+(define *host* "localhost")
 
 ; Ladda in nivåfilerna
 (define *number-of-maps* 7)
@@ -154,7 +154,7 @@
 (define *main-menu-animation-timer*
   (new timer%
        [interval 500]
-       [notify-callback (send *game-canvas* on-paint)]))
+       [notify-callback draw-main-menu]))
 (send *main-menu-animation-timer* stop)
 
 (define *game-music-timer*

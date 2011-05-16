@@ -213,14 +213,12 @@
     
     ; Den publika ritfunktionen
     (define/public (draw)
-      (send dc clear)
-      (send canvas on-paint))
-;      (if refresh?
-;          (begin
-;            (fill-canvas)
-;            (set! refresh? #f)
-;            (refresh))
-;          (refresh)))
+      (if refresh?
+          (begin
+            (fill-canvas)
+            (set! refresh? #f)
+            (refresh))
+          (refresh)))
     
     ; Avslutar animationen på en specifik koordinat
     ; tar även bort detta element ur listan
@@ -255,9 +253,6 @@
     
     (define/public (get-width)
       canvas-width)
-    
-    (define/public (on-paint)
-      (send canvas on-paint))
     
     ; Kör en animation som ligger "ovanpå" spelaren.
     (define/public (run-animation position identifier)

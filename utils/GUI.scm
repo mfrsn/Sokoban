@@ -85,8 +85,6 @@
   (define game-canvas
     (new game-canvas%
          [parent mid-panel]
-         [paint-callback (lambda (canvas dc)
-                           draw-main-menu)]
          [min-width game-canvas-width]
          [min-height game-canvas-height]))
   
