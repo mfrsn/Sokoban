@@ -28,7 +28,8 @@
      (background-png (make-object bitmap% "data/textures/background.png"))
      (teleport-icon-png (make-object bitmap% "data/sidebar/teleport-icon.png" 'png/mask))
      (teleport-icon-mask (send teleport-icon-png get-loaded-mask))
-     (font (send the-font-list find-or-create-font 16 "Arial Rounded MT Bold" 'default 'normal 'normal)))
+     (font (send the-font-list find-or-create-font
+                 16 "Arial Rounded MT Bold" 'default 'normal 'normal)))
     
     (send dc set-text-foreground colour-text)
     (send dc set-font font)

@@ -25,7 +25,9 @@
     
     ; ansluter till servern och skickar arg-lst till den
     (define/private (connect . arg-lst)
-      (define-values (server->client client->server) (tcp-connect host-address port-number))
+      (define-values
+        (server->client client->server)
+        (tcp-connect host-address port-number))
       (write arg-lst client->server)
       (flush-output client->server)
       (let ((response (read server->client)))

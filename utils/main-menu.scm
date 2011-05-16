@@ -20,39 +20,79 @@
      ; Bilder
      ; Huvudmenyns bilder
      (main-menu-background-png
-      (make-object bitmap% "data/textures/background-main-menu.png"))
+      (make-object bitmap%
+        "data/textures/background-main-menu.png"))
+     
      (main-menu-pane-png
-      (make-object bitmap% "data/mainmenu/menu-background.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/menu-background.png"
+        'png/mask))
+     
      (main-menu-pane-mask-png
       (send main-menu-pane-png get-loaded-mask))
+     
      (main-menu-new-game-button-png
-      (make-object bitmap% "data/mainmenu/new-game-button.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/new-game-button.png"
+        'png/mask))
+     
      (main-menu-new-game-button-mouseover-png
-      (make-object bitmap% "data/mainmenu/new-game-button-mouseover.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/new-game-button-mouseover.png"
+        'png/mask))
+     
      (main-menu-highscore-button-png
-      (make-object bitmap% "data/mainmenu/highscore-button.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-button.png"
+        'png/mask))
+     
      (main-menu-highscore-button-mouseover-png
-      (make-object bitmap% "data/mainmenu/highscore-button-mouseover.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-button-mouseover.png"
+        'png/mask))
+     
      (main-menu-about-button-png
-      (make-object bitmap% "data/mainmenu/about-button.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/about-button.png"
+        'png/mask))
+     
      (main-menu-about-button-mouseover-png
-      (make-object bitmap% "data/mainmenu/about-button-mouseover.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/about-button-mouseover.png"
+        'png/mask))
      
      ; Highscoremenyns bilder
      (highscore-menu-background-png
-      (make-object bitmap% "data/textures/background-highscore.png"))
+      (make-object bitmap%
+        "data/textures/background-highscore.png"))
+     
      (highscore-menu-pane-png
-      (make-object bitmap% "data/mainmenu/highscore-background.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-background.png"
+        'png/mask))
+     
      (highscore-menu-pane-mask-png
       (send highscore-menu-pane-png get-loaded-mask))
+     
      (highscore-menu-next-level-button-png
-      (make-object bitmap% "data/mainmenu/highscore-next-level-button.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-next-level-button.png"
+        'png/mask))
+     
      (highscore-menu-next-level-button-mouseover-png
-      (make-object bitmap% "data/mainmenu/highscore-next-level-button-mouseover.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-next-level-button-mouseover.png"
+        'png/mask))
+     
      (highscore-menu-previous-level-button-png
-      (make-object bitmap% "data/mainmenu/highscore-previous-level-button.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-previous-level-button.png"
+        'png/mask))
+     
      (highscore-menu-previous-level-button-mouseover-png
-      (make-object bitmap% "data/mainmenu/highscore-previous-level-button-mouseover.png" 'png/mask))
+      (make-object bitmap%
+        "data/mainmenu/highscore-previous-level-button-mouseover.png"
+        'png/mask))
      
      ; Aboutmenyns bilder
      (about-menu-background-png
@@ -63,12 +103,14 @@
      (canvas-width *game-canvas-width*)
      (canvas-height *game-canvas-height*)
      (total-width (+ canvas-width *game-sidebar-width*))
+     
      ; Huvudmenyns konstanter
      (on-main-menu? #t)
      (main-menu-position
       (calculate-menu-background-position 'main-menu))
      (main-menu-button-y-offset 20)
      (main-menu-button-spacing 10)
+     
      ; Highscoremenyns konstanter
      (on-highscore-menu? #f)
      (highscore-list '())
@@ -86,6 +128,7 @@
      (highscore-y-offset 20)
      (highscore-header-y-offset 25)
      (number-of-highscore-entrys 5)
+     
      ; Aboutmenyns konstanter
      (on-about-menu? #f)
      (about-x-offset 20)

@@ -72,7 +72,7 @@
   
   ; Definierar spelets in-game meny.
   (define game-sidebar
-    (new sidebar-canvas%
+    (new canvas%
          [parent mid-panel]
          [min-width game-menu-width]
          [min-height game-menu-height]))
