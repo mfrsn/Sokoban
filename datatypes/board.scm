@@ -1,7 +1,6 @@
 ;============================================================
 ; PRAM 2011
-; Senaste ändring: Lagt till funktionalitet för att ångra sina drag
-; 2011-05-13
+; Senaste ändring: Lagt till funktionalitet för att ångra sina drag 2011-05-13
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -10,7 +9,7 @@
 ; Beskrivning: Definierar den abstrakta datatypen Board
 ;============================================================
 
-(require scheme/mpair)
+; (require scheme/mpair)
 
 ; Klass
 (define board%
@@ -27,7 +26,11 @@
            
            ; Lista med målområdesobjekten för effektiv åtkomst vid vinstkontroll
            (list-of-goals '())
+           
+           ; Lista med historik över drag (spelarpositioner osv)
            (history-list '())
+           
+           ; Spelarens startposition, till för reset
            (start-position #f))
     
     ; #### Private ####
@@ -47,21 +50,27 @@
       (eq? (send (get-object position) get-type) 'goal))
     
     ; Funktion som hanterar förflyttning av block och spelare
-    (define/private (handle-block-move player block player-position block-position direction)
+    (define/private (handle-block-move player
+                                       block
+                                       player-position
+                                       block-position
+                                       direction)
       (let ((new-position (calc-new-position block-position direction))
             (power-up-queue (send player get-power-up-queue)))
         (cond ((and (eq? power-up-queue 'teleport)
                     (not (on-goal? block-position)))
                (do-move! block block-position (first-available-goal-position))
                (do-move! player player-position block-position)
-               (set! history-list (cons (list 'teleport player-position block) history-list))
+               (set! history-list
+                     (cons (list 'teleport player-position block) history-list))
                (send player clear-power-up-queue!)
                (send *counter* increase!))
               ((and (is-empty? new-position)
                     (check-square new-position))
                (do-move! block block-position new-position)
                (do-move! player player-position block-position)
-               (set! history-list (cons (list 'block player-position block) history-list))
+               (set! history-list
+                     (cons (list 'block player-position block) history-list))
                (send *counter* increase!))
               (else (void)))))
     
@@ -110,7 +119,8 @@
                #t)
               ((eq? (send (mcar list-of-goals) get-object) 'empty)
                #f)
-              ((not (eq? (send (send (mcar list-of-goals) get-object) get-type) 'block))
+              ((not (eq? (send (send (mcar list-of-goals) get-object) get-type)
+                         'block))
                #f)
               (else (goal-iter (mcdr list-of-goals)))))
       (goal-iter list-of-goals))
@@ -150,7 +160,8 @@
     
     ; Sätter golv-objektet på position till object
     (define/public (set-square! position object)
-      (send board set-element! object (get-x-position position) (get-y-position position))
+      (send board set-element!
+            object (get-x-position position) (get-y-position position))
       (send object set-position! position))
     
     ; Funktionen som kontrollerar förflyttning på spelplanen
@@ -164,13 +175,25 @@
                 (begin
                   (do-move! object current-position new-position)
                   (send *counter* increase!)
-                  (set! history-list (cons (list 'player current-position 'dont-care) history-list)))
+                  (set! history-list
+                        (cons (list 'player current-position 'dont-care)
+                              history-list)))
                 (if (eq? (send check-square-result get-type) 'block)
-                    (handle-block-move object check-square-result current-position new-position direction)
-                    (handle-power-up object check-square-result current-position new-position))))))
+                    (handle-block-move object
+                                       check-square-result
+                                       current-position
+                                       new-position
+                                       direction)
+                    (handle-power-up object
+                                     check-square-result
+                                     current-position
+                                     new-position))))))
     
+    ; Lägger till ångra för användning av power-up, eftersom
+    ; spelaren inte rör sig krävs en extra funktion.
     (define/public (add-use-power-up-history! power-up-object)
-      (set! history-list (cons (list 'use-power-up 'dont-care power-up-object) history-list)))
+      (set! history-list
+            (cons (list 'use-power-up 'dont-care power-up-object) history-list)))
     
     ; Ängrar senasteförflyttningen. Alla förflyttningar sparas, inklusive
     ; teleporteringar. Historiklistan har följande format:
@@ -182,15 +205,15 @@
           (let* ((current-move (car history-list))
                  (move-type (get-history-type current-move))
                  (player-pos (send player get-position)))
-            (cond ((eq? move-type 'player)
+            (cond ((eq? move-type 'player) ; endast spelaren har flyttat sig
                    (do-move! player player-pos (get-history-position current-move))
                    (send *counter* decrease!))
-                  ((eq? move-type 'block)
+                  ((eq? move-type 'block) ; ett block har flyttats
                    (define block (get-history-object current-move))
                    (do-move! player player-pos (get-history-position current-move))
                    (do-move! block (send block get-position) player-pos)
                    (send *counter* decrease!))
-                  ((eq? move-type 'teleport)
+                  ((eq? move-type 'teleport) ; ett block har teleporterats
                    (define block (get-history-object current-move))
                    (send player add-power-up! (new power-up%
                                                    [current-position 'player]
@@ -199,15 +222,15 @@
                    (do-move! player player-pos (get-history-position current-move))
                    (do-move! block (send block get-position) player-pos)
                    (send *counter* decrease!))
-                  ((eq? move-type 'powerup)
+                  ((eq? move-type 'powerup) ; en power-up har plockats upp
                    (do-move! player player-pos (get-history-position current-move))
                    (send player remove-one-powerup!)
                    (add-powerup! this player-pos 'teleport)
                    (send *counter* decrease!))
-                  ((eq? move-type 'use-power-up)
+                  ((eq? move-type 'use-power-up) ; en power-up har använts
                    (send player clear-power-up-queue!)
                    (send player add-power-up! (get-history-object current-move))))
-                   
+
             (set! history-list (cdr history-list)))))
     
     ; skriver ut brädet i textform
@@ -222,9 +245,11 @@
                           (begin (display (send (get-object (make-position col row))
                                                 get-type))
                                  (display " "))
-                          (begin (display (send (send (get-object (make-position col row))
-                                                      get-object)
-                                                get-type))
+                          (begin (display (send
+                                           (send
+                                            (get-object (make-position col row))
+                                            get-object)
+                                           get-type))
                                  (display " ")))
                       (iter-c (+ col 1)))))
         

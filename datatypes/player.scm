@@ -77,7 +77,7 @@
           (void)
           (let* ((power-up (car power-ups))
                  (sub-type (send power-up get-sub-type)))
-            (cond ((null? power-ups) (display "No power-up")) ; Meddelande om ingen power-up här
+            (cond ((null? power-ups) (display "No power-up"))
                   ((and (eq? sub-type 'teleport)
                         (eq? power-up-queue 'empty))
                    (set! power-up-queue 'teleport)

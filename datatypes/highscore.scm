@@ -95,7 +95,9 @@
       (define (help iter-list res-list iter-num)
         (cond ((null? iter-list) (reverse res-list))
               ((= iter-num number-of-entries) (reverse res-list))
-              (else (help (cdr iter-list) (cons (car iter-list) res-list) (+ iter-num 1)))))
+              (else (help (cdr iter-list)
+                          (cons (car iter-list) res-list)
+                          (+ iter-num 1)))))
       (help scorelist '() 0))
     
     ; skriver ut en formaterad lista

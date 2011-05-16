@@ -1,11 +1,12 @@
 ;=====================================================
-; PRAM 2011, Senast ändrad 2011-04-01
+; PRAM 2011
+; Senaste ändring: filen skapad 2011-04-01
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
 ; Fil: counter.scm
-; Beskrivning: Räknarobjekt som håller koll på omgångens
-; poäng.
+; Beskrivning: Räknarobjekt som håller koll på omgångens poäng.
 ;=====================================================
 
 (define counter%
