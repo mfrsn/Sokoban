@@ -55,9 +55,13 @@
   (set! *main-menu-active?* #f)
   (set! *current-level* 0)
   (load-level!)
+  (stop-music!)
   (send player-name-dialog show #t))
 
 (define (main-menu!)
+  (if (not *music-on?*)
+      (play-music!)
+      (void))
   (send *main-menu-animation-timer* start 50)
   (set! *main-menu-active?* #t)
   (send *main-menu* set-on-main-menu! #t)
@@ -66,7 +70,18 @@
   (send *game-sidebar* draw-main-menu))
 
 (define (quit!)
+  (stop-music!)
   (send *main-menu-animation-timer* stop)
   (set! *main-menu-active?* #f)
   (send *game-canvas* stop-all-animations)
   (send *game-frame* show #f))
+
+(define (play-music!)
+  (set! *music-on?* #t)
+  (send *game-music-timer* notify)
+  (send *game-music-timer* start 118375 #t))
+
+(define (stop-music!)
+  (set! *music-on?* #f)
+  (play-sound "data/sounds/power-up.wav" #t)
+  (send *game-music-timer* stop))
