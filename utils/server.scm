@@ -34,7 +34,8 @@
     (define (add-score! arg-lst)
       (cond ((not (= (length arg-lst) 3)) #f)
             (else
-             (send (get-highscore-object (car arg-lst)) add-entry! (cadr arg-lst) (caddr arg-lst))
+             (send (get-highscore-object (car arg-lst)) add-entry!
+                   (cadr arg-lst) (caddr arg-lst))
              #t)))
     
     ; TODO: ordentlig felhantering
@@ -74,10 +75,11 @@
       (define (help iter-lst iter-num)
         (cond ((null? iter-lst) (void))
               (else
-               (set! highscore-list (cons (cons iter-num
-                                                (new highscore% [level iter-num]
-                                                                [scorelist (car iter-lst)]))
-                                          highscore-list))
+               (set! highscore-list
+                     (cons (cons iter-num
+                                 (new highscore% [level iter-num]
+                                      [scorelist (car iter-lst)]))
+                           highscore-list))
                (help (cdr iter-lst) (+ iter-num 1)))))
       
       (help highscores 0))
@@ -91,7 +93,10 @@
     ; NOTE: saknar felhanting, två highscore's med samma level-number ger
     ; odefinierat beteende.
     (define/public (add-highscore! level-number)
-      (set! highscore-list (cons (cons level-number (new highscore% [level level-number])) highscore-list)))
+      (set! highscore-list
+            (cons (cons level-number
+                        (new highscore% [level level-number]))
+                  highscore-list)))
     
     (define/public (start)
       ;(load-highscore-file)

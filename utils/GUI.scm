@@ -56,6 +56,24 @@
                      (main-menu!)
                      (send game-canvas focus))]))
   
+;  (define mute-button
+;    (new button%
+;     [label "Mute"]
+;     [parent top-panel]
+;     [min-width 60]
+;     [callback (lambda (button event)
+;                 (if *music-on?*
+;                     (begin
+;                       (set! *music-on?* #f)
+;                       (stop-music!)
+;                       (send mute-button set-label "Unmute")
+;                       (send *game-canvas* focus))
+;                     (begin
+;                       (set! *music-on?* #t)
+;                       (play-music!)
+;                       (send mute-button set-label "Mute")
+;                       (send *game-canvas* focus))))]))
+  
   (define quit-button
     (new button%
          [label "Quit"]
@@ -72,7 +90,7 @@
   
   ; Definierar spelets in-game meny.
   (define game-sidebar
-    (new sidebar-canvas%
+    (new canvas%
          [parent mid-panel]
          [min-width game-menu-width]
          [min-height game-menu-height]))

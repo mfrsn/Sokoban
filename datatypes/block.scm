@@ -1,5 +1,7 @@
 ;=====================================================
-; PRAM 2011, Senast ändrad 2011-03-30
+; PRAM 2011
+; Senaste ändring: block-klass skapad 2011-03-30
+;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;

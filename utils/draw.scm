@@ -40,6 +40,7 @@
      
      ; PNGs
      (player-png (make-object bitmap% "data/textures/player.png" 'png/mask))
+     (player-mask (send player-png get-loaded-mask))
      (background-png (make-object bitmap% "data/textures/background.png"))
      (block-png (make-object bitmap% "data/textures/block.png"))
      (floor-png (make-object bitmap% "data/textures/floor.png"))
@@ -47,20 +48,22 @@
      (wall-png (make-object bitmap% "data/textures/wall.png"))
      
      ; Gifs
-     (star-list (list (make-object bitmap% "data/animations/star/star1.png" 'png/mask)
-                      (make-object bitmap% "data/animations/star/star2.png" 'png/mask)
-                      (make-object bitmap% "data/animations/star/star3.png" 'png/mask)
-                      (make-object bitmap% "data/animations/star/star4.png" 'png/mask)
-                      (make-object bitmap% "data/animations/star/star5.png" 'png/mask)))
+     (star-list
+      (list (make-object bitmap% "data/animations/star/star1.png" 'png/mask)
+            (make-object bitmap% "data/animations/star/star2.png" 'png/mask)
+            (make-object bitmap% "data/animations/star/star3.png" 'png/mask)
+            (make-object bitmap% "data/animations/star/star4.png" 'png/mask)
+            (make-object bitmap% "data/animations/star/star5.png" 'png/mask)))
      
-     (blink-list (list (make-object bitmap% "data/animations/blink/gif1.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif2.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif3.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif4.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif5.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif6.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif7.png" 'png/mask)
-                       (make-object bitmap% "data/animations/blink/gif8.png" 'png/mask)))                       
+     (blink-list
+      (list (make-object bitmap% "data/animations/blink/gif1.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif2.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif3.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif4.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif5.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif6.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif7.png" 'png/mask)
+            (make-object bitmap% "data/animations/blink/gif8.png" 'png/mask)))         
      
      ; Brushes
      (no-brush (make-object brush% "WHITE" 'transparent))
@@ -84,18 +87,9 @@
      (black-pen (make-object pen% "BLACK" 1 'solid))
      (black-pen2 (make-object pen% "BLACK" 2 'solid)))
     
-    
     ; #### Private ####
-    ; Masks
-    (define player-mask (send player-png get-loaded-mask))
     
-    ; Ritar ett block med sitt övre vänstra hörn i position
-    (define/private (draw-block position)
-      (let ((draw-position (translate-position position)))
-        (send dc draw-rectangle (get-x-position draw-position) (get-y-position draw-position) block-size block-size)
-        (send dc set-brush no-brush)))
-    
-    ; Fyller hela canvas med background-colour
+    ; Fyller hela canvas med bakgrundsbilden
     (define/private (fill-canvas)
       (draw-png (make-position 0 0) background-png))
     
@@ -103,15 +97,24 @@
     (define/private (make-colour r g b)
       (make-object color% r g b))
     
-    ; Rita en bitmap
+    ; Ritar upp en maskerad bild
     (define/private (draw-masked-png position png mask)
       (let ((draw-position (translate-position position)))
-        (send dc draw-bitmap png (get-x-position draw-position) (get-y-position draw-position) 'solid floor-colour mask)))
+        (send dc draw-bitmap
+              png
+              (get-x-position draw-position)
+              (get-y-position draw-position)
+              'solid
+              floor-colour
+              mask)))
     
-    ; Rita en bitmap
+    ; Ritar upp en bild
     (define/private (draw-png position png)
       (let ((draw-position (translate-position position)))
-        (send dc draw-bitmap png (get-x-position draw-position) (get-y-position draw-position))))
+        (send dc draw-bitmap
+              png
+              (get-x-position draw-position)
+              (get-y-position draw-position))))
       
     ; Funktion som "översätter" en position ur board till en position på canvas
     (define/private (translate-position position)
@@ -251,12 +254,10 @@
     (define/public (get-width)
       canvas-width)
     
-    ; Kör en animation som ligger "ovanpå" spelaren ytterligare args vid utbyggnad:
-    ; 'gif-identifier (vilken animation?) bestämmer vilken gif-lista som skickas med
-    ; 'object-identifier (på vilket objekt ligger animationen?)
-    (define/public (run-animation position)
-      (make-new-animation position blink-list player-png))
+    ; Kör en animation som ligger "ovanpå" spelaren.
+    (define/public (run-animation position identifier)
+      (cond ((eq? identifier 'blink)
+             (make-new-animation position blink-list player-png))
+            (else (error "Unknown gif identifier:" identifier))))
     
     (super-new)))
-
-  

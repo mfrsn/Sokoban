@@ -26,7 +26,6 @@
 (load "utils/draw.scm")
 (load "utils/game-control.scm")
 (load "utils/cgif.scm")
-(load "utils/csidebar.scm")
 (load "utils/draw-sidebar.scm")
 (load "utils/main-menu.scm")
 (load "utils/main-menu-button.scm")
@@ -78,7 +77,6 @@
 (define *game-sidebar-height* 480)
 (define *victory* #f)
 
-
 ; Miljön
 (define GUI (make-gui *game-canvas-width*
                       *game-canvas-height*
@@ -96,6 +94,8 @@
 (define *main-menu* (new main-menu%
                          [canvas (get-game-canvas GUI)]
                          [highscore-client *highscore-client*]))
+
+(define *music-on?* #t)
 
 ; Spelloopen, ligger endast och väntar på knapptryckningar
 (define (handle-key-event key)
@@ -123,28 +123,48 @@
        (if (send *current-board* level-complete?)
            (begin
              (play-sound "data/sounds/win-sound.wav" #t)
-             (send *highscore-client* upload-score *current-level* *player-name* (send *counter* get-count))
+             (send *highscore-client* upload-score
+                   *current-level*
+                   *player-name*
+                   (send *counter* get-count))
              (send win-dialog show #t))
            (void)))))
 
 ; Hantera musevent för huvudcanvas
 (define (handle-mouse-event event)
   (if *main-menu-active?*
-      (send *main-menu* handle-mouse-event (send event get-x) (send event get-y) (send event get-event-type))
+      (send *main-menu* handle-mouse-event
+            (send event get-x)
+            (send event get-y)
+            (send event get-event-type))
       (void)))
 
+; Rita upp huvudmenyn
 (define (draw-main-menu)
   (send *main-menu* draw)
   (send *game-sidebar* draw-main-menu))
 
+; Spela musiken
+(define (play-music)
+  (if *music-on?*
+      (play-sound "data/sounds/sokoban-score.wav" #t)
+      (void)))
+
 ; Huvudmenyns animationstimer
-(define *main-menu-animation-timer* (new timer%
-                                         [interval 500]
-                                         [notify-callback draw-main-menu]))
+(define *main-menu-animation-timer*
+  (new timer%
+       [interval 500]
+       [notify-callback draw-main-menu]))
 (send *main-menu-animation-timer* stop)
 
-; Starta spelet
+(define *game-music-timer*
+  (new timer%
+       [interval 100]
+       [notify-callback play-music]))
+(send *game-music-timer* stop)
 
+; Starta spelet
 (define (run)
   (send *game-frame* show #t)
+  (play-music!)
   (main-menu!))

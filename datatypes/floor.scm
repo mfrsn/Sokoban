@@ -1,12 +1,12 @@
 ;=======================================================
 ; PRAM 2011
-; Senaste ändring: 2011-04-01
+; Senaste ändring: filen skapad 2011-04-01
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
 ;
 ; Fil: floor.scm
-; Beskrivning: Definierar den abstrakta datatypen Floor
+; Beskrivning: Definierar den abstrakta datatypen floor
 ;=======================================================
 
 ; Klass
