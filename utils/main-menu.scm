@@ -335,7 +335,8 @@
       (draw-text "player by using the arrow keys for moving and the" 5)
       (draw-text "\"p\" key for using power-ups. These can teleport a block" 6)
       (draw-text "directly to an available goal square by simply moving" 7)
-      (draw-text "into a block while the power-up is activated." 8)
+      (draw-text "into a block while the power-up is activated. It is also" 8)
+      (draw-text "possible to undo your moves by pressing the \"u\" key." 9)
       (draw-text "Good luck!" 10)
       (draw-text "Marcus & Mattias" 11))
     
@@ -523,11 +524,11 @@
     
     ; Den publika utritningsfunktionen
     (define/public (draw)
-      ;(send dc suspend-flush)
+      (send dc suspend-flush)
       (refresh)
-      ;(send dc flush)
-      ;(send dc resume-flush))
-      )
+      (send dc flush)
+      (send dc resume-flush))
+      ;)
     
     ; Funktion som tillåter ändring av menytillstånd utanför klassen
     (define/public (set-on-main-menu! bool)
