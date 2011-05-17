@@ -1,6 +1,7 @@
 ;================================================================
 ; PRAM 2011
-; Senaste ändring: la till kontroll i next-level! 2011-05-10
+; Senaste ändring: Kontroller för stopp och star av musik
+; 2011-05-10
 ;
 ; Projekt: Sokoban
 ; Mattias Fransson, Marcus Eriksson, grupp 4, Y1a
@@ -83,5 +84,5 @@
 
 (define (stop-music!)
   (set! *music-on?* #f)
-  (play-sound "data/sounds/power-up.wav" #t)
+  (play-sound "data/sounds/silence.wav" #t)
   (send *game-music-timer* stop))
