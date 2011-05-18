@@ -147,7 +147,8 @@
 ; Spela musiken
 (define (play-music)
   (if *music-on?*
-      (play-sound "data/sounds/sokoban-score.wav" #t)
+      ;(play-sound "data/sounds/sokoban-score.wav" #t)
+      (void)
       (void)))
 
 ; Huvudmenyns animationstimer
