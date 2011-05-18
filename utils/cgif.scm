@@ -100,7 +100,12 @@
                          (car mask-list)))
                  (begin
                    (send dc draw-bitmap background x-position y-position)
-                   (send dc draw-bitmap object x-position y-position 'solid black object-mask)
+                   (send dc draw-bitmap
+                         object
+                         x-position
+                         y-position
+                         'solid black
+                         object-mask)
                    (send dc draw-bitmap
                          (car draw-list)
                          x-position

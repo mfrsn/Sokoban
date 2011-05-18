@@ -22,9 +22,6 @@
            (power-ups '())
            (power-up-queue 'empty)) ; Lista som lagrar power-up-procedurer
     
-    ; #### Private ####
-    
-    
     ; #### Public ####
     
     ; Getters

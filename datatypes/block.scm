@@ -18,14 +18,12 @@
     
     ; Lokala fält
     (field (type 'block))
-    
-    ; #### Private ####
+
+    ; #### Public ####
     
     ; Setters
     (define/public (set-position! position)
       (set! current-position position))
-    
-    ; #### Public ####
     
     ; Getters
     (define/public (get-position)

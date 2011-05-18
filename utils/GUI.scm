@@ -56,24 +56,6 @@
                      (main-menu!)
                      (send game-canvas focus))]))
   
-;  (define mute-button
-;    (new button%
-;     [label "Mute"]
-;     [parent top-panel]
-;     [min-width 60]
-;     [callback (lambda (button event)
-;                 (if *music-on?*
-;                     (begin
-;                       (set! *music-on?* #f)
-;                       (stop-music!)
-;                       (send mute-button set-label "Unmute")
-;                       (send *game-canvas* focus))
-;                     (begin
-;                       (set! *music-on?* #t)
-;                       (play-music!)
-;                       (send mute-button set-label "Mute")
-;                       (send *game-canvas* focus))))]))
-  
   (define quit-button
     (new button%
          [label "Quit"]
@@ -173,7 +155,8 @@
                             (send name-length-error-dialog show #t))
                            ((> name-length 12)
                             (send name-length-error-message 
-                                  set-label "Your name can only be up to 12 characters long!")
+                                  set-label
+                                  "Your name can only be up to 12 characters long!")
                             (send name-length-error-dialog show #t))
                            (else
                             (set! *player-name* entered-name)

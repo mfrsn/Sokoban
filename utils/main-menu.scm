@@ -524,11 +524,11 @@
     
     ; Den publika utritningsfunktionen
     (define/public (draw)
-      (send dc suspend-flush)
+      ;(send dc suspend-flush)
       (refresh)
-      (send dc flush)
-      (send dc resume-flush))
-      ;)
+      ;(send dc flush)
+      ;(send dc resume-flush))
+      )
     
     ; Funktion som tillåter ändring av menytillstånd utanför klassen
     (define/public (set-on-main-menu! bool)
